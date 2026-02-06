@@ -1,10 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 
-// Hybrid Hosting: Custom -> Local -> Cloud
-const FALLBACK_CLOUD = 'https://server-blue-delta.vercel.app'; // Default Vercel Project Name
-const isNative = Capacitor.isNativePlatform();
-
-let cachedBaseUrl: string | null = null;
+import { ServerManager, isNative } from '../utils/server-manager';
+export { ServerManager, isNative };
 
 const fetchApi = (url: string, init?: RequestInit) => {
     return fetch(url, {
@@ -14,118 +11,6 @@ const fetchApi = (url: string, init?: RequestInit) => {
             'Bypass-Tunnel-Reminder': 'true',
         }
     });
-};
-
-const CURRENT_VERSION = '1.1.4';
-
-/**
- * ServerManager handles dynamic discovery of either:
- * 1. A custom local IP (Settings)
- * 2. The built-in Local Proxy (/hianime)
- * 3. A fallback cloud API
- */
-export const ServerManager = {
-    async checkVersion(url: string): Promise<boolean> {
-        try {
-            const cleanUrl = url.replace(/\/$/, '');
-            const res = await fetch(`${cleanUrl}/check-version`, {
-                method: 'GET',
-                signal: AbortSignal.timeout(2000)
-            });
-            if (res.ok) {
-                const data = await res.json();
-                console.log(`[ServerManager] Version Check for ${url}: ${data.version}`);
-                return data.version === CURRENT_VERSION;
-            }
-        } catch (e) {
-            console.warn(`[ServerManager] Version check failed for ${url}`);
-        }
-        return false;
-    },
-
-    reset: async (): Promise<void> => { cachedBaseUrl = null; },
-    getUrl: async (): Promise<string> => {
-        // v1.1.0 STALE CACE FIX: If we are on mobile, and the cache is 'localhost', it's WRONG.
-        // Localhost on mobile means the phone itself, which isn't running the server.
-        if (cachedBaseUrl && isNative && cachedBaseUrl.includes('localhost')) {
-            console.warn('[ServerManager] Clearing stale localhost cache on Native device');
-            cachedBaseUrl = null;
-        }
-
-        if (cachedBaseUrl) return cachedBaseUrl;
-
-        // 1. Custom URL (Tunnel or Network IP)
-        const custom = localStorage.getItem('custom_anime_server');
-        // On native, window.location.hostname is usually 'localhost', but it's NOT the backend machine.
-        const isLocalHost = !isNative && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-        if (custom) {
-             const clean = custom.replace(/\/$/, '');
-             
-             // PARANOIA: If we have a localhost custom server but the app is NOT on localhost, ignore it
-             if (clean.includes('localhost') && !isLocalHost) {
-                 console.warn('Ignoring localhost custom server while on cloud');
-                 localStorage.removeItem('custom_anime_server');
-             } else {
-                 try {
-                      const res = await fetch(`${clean}/home`, { 
-                          method: 'HEAD',
-                          headers: { 'Bypass-Tunnel-Reminder': 'true' }
-                      });
-                      if (res.ok) {
-                          cachedBaseUrl = clean;
-                          return cachedBaseUrl;
-                      }
-                 } catch(e) { 
-                     console.warn('Custom server failed:', e);
-                     if (clean.includes('localhost')) localStorage.removeItem('custom_anime_server');
-                 }
-             }
-        }
-
-        // 2. Default Local/Proxy (SKIP ON NATIVE - phone doesn't have a local hianime proxy)
-        if (!isNative) {
-            try {
-                // Use a small fetch to see if the local proxy is actually ALIVE
-                const res = await fetch('/hianime/home', { method: 'HEAD' });
-            // content-type check ensures we aren't getting a generic 404/500 page from Vite but a real API response
-            const isJson = res.headers.get('content-type')?.includes('application/json');
-            
-            if (res.ok && isJson) {
-                // Version Check (Local development only)
-                if (window.location.hostname === 'localhost') {
-                    const isLatest = await ServerManager.checkVersion('/hianime');
-                    if (!isLatest) {
-                        console.error('CRITICAL: Local Anime Proxy is outdated! Please run "npm run server" to update.');
-                        // We continue anyway, but the log remains
-                    }
-                }
-                cachedBaseUrl = '/hianime';
-                return cachedBaseUrl;
-            }
-        } catch(e) {}
-    }
-
-        // 3. Cloud Fallback
-        try {
-            const cloudRes = await fetchApi(`${FALLBACK_CLOUD}/home`, { method: 'HEAD' });
-            if (cloudRes.ok) {
-                cachedBaseUrl = FALLBACK_CLOUD;
-                return cachedBaseUrl;
-            }
-        } catch (e) {}
-        
-        // Final Fallback Logic:
-        // On Vercel (browser), we always use /hianime because it's rewritten to the backend.
-        // On a phone/local dev, we use either the cloud or the local proxy.
-        const isVercel = !isNative && window.location.hostname.includes('vercel.app');
-        const isLocalBrowser = !isNative && isLocalHost;
-
-        if (isVercel) return '/hianime';
-        if (isLocalBrowser) return '/hianime'; // Vite proxy
-
-        return FALLBACK_CLOUD;
-    }
 };
 
 export interface AnimeTitle {

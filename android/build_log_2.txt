@@ -1,0 +1,489 @@
+
+> Configure project :app
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Configure project :capacitor-cordova-android-plugins
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :capacitor-android:preBuild UP-TO-DATE
+> Task :capacitor-android:preDebugBuild UP-TO-DATE
+> Task :capacitor-app:preBuild UP-TO-DATE
+> Task :capacitor-app:preDebugBuild UP-TO-DATE
+> Task :capacitor-browser:preBuild UP-TO-DATE
+> Task :capacitor-browser:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-keep-awake:preBuild UP-TO-DATE
+> Task :capacitor-community-keep-awake:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-speech-recognition:preBuild UP-TO-DATE
+> Task :capacitor-community-speech-recognition:preDebugBuild UP-TO-DATE
+> Task :capacitor-app:writeDebugAarMetadata
+> Task :capacitor-browser:writeDebugAarMetadata
+> Task :capacitor-community-keep-awake:writeDebugAarMetadata
+> Task :capacitor-android:writeDebugAarMetadata
+> Task :app:javaPreCompileDebug
+> Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
+> Task :capacitor-community-speech-recognition:writeDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:preDebugBuild UP-TO-DATE
+> Task :capacitor-filesystem:preBuild UP-TO-DATE
+> Task :capacitor-filesystem:preDebugBuild UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:writeDebugAarMetadata
+> Task :capacitor-haptics:preBuild UP-TO-DATE
+> Task :capacitor-haptics:preDebugBuild UP-TO-DATE
+> Task :capacitor-filesystem:writeDebugAarMetadata
+> Task :capacitor-local-notifications:preBuild UP-TO-DATE
+> Task :capacitor-local-notifications:preDebugBuild UP-TO-DATE
+> Task :capacitor-haptics:writeDebugAarMetadata
+> Task :capacitor-screen-orientation:preBuild UP-TO-DATE
+> Task :capacitor-screen-orientation:preDebugBuild UP-TO-DATE
+> Task :capacitor-local-notifications:writeDebugAarMetadata
+> Task :capacitor-status-bar:preBuild UP-TO-DATE
+> Task :capacitor-status-bar:preDebugBuild UP-TO-DATE
+> Task :capacitor-screen-orientation:writeDebugAarMetadata
+> Task :capacitor-status-bar:writeDebugAarMetadata
+> Task :capacitor-android:processDebugNavigationResources
+> Task :capacitor-app:processDebugNavigationResources
+> Task :capacitor-browser:processDebugNavigationResources
+> Task :capacitor-community-keep-awake:processDebugNavigationResources
+> Task :app:checkDebugAarMetadata
+> Task :capacitor-community-speech-recognition:processDebugNavigationResources
+> Task :capacitor-cordova-android-plugins:processDebugNavigationResources
+> Task :capacitor-filesystem:processDebugNavigationResources
+> Task :capacitor-haptics:processDebugNavigationResources
+> Task :capacitor-local-notifications:processDebugNavigationResources
+> Task :capacitor-screen-orientation:processDebugNavigationResources
+> Task :capacitor-status-bar:processDebugNavigationResources
+> Task :app:processDebugNavigationResources
+> Task :app:generateDebugResValues
+> Task :capacitor-android:generateDebugResValues
+> Task :app:compileDebugNavigationResources
+> Task :capacitor-android:generateDebugResources
+> Task :capacitor-android:packageDebugResources
+> Task :capacitor-app:generateDebugResValues
+> Task :capacitor-app:generateDebugResources
+> Task :capacitor-app:packageDebugResources
+> Task :capacitor-browser:generateDebugResValues
+> Task :capacitor-browser:generateDebugResources
+> Task :capacitor-browser:packageDebugResources
+> Task :capacitor-community-keep-awake:generateDebugResValues
+> Task :capacitor-community-keep-awake:generateDebugResources
+> Task :capacitor-community-keep-awake:packageDebugResources
+> Task :capacitor-community-speech-recognition:generateDebugResValues
+> Task :capacitor-community-speech-recognition:generateDebugResources
+> Task :capacitor-community-speech-recognition:packageDebugResources
+> Task :capacitor-cordova-android-plugins:generateDebugResValues
+> Task :capacitor-cordova-android-plugins:generateDebugResources
+> Task :capacitor-cordova-android-plugins:packageDebugResources
+> Task :capacitor-filesystem:generateDebugResValues
+> Task :capacitor-filesystem:generateDebugResources
+> Task :capacitor-filesystem:packageDebugResources
+> Task :capacitor-haptics:generateDebugResValues
+> Task :capacitor-haptics:generateDebugResources
+> Task :capacitor-haptics:packageDebugResources
+> Task :capacitor-local-notifications:generateDebugResValues
+> Task :capacitor-local-notifications:generateDebugResources
+> Task :capacitor-local-notifications:packageDebugResources
+> Task :capacitor-screen-orientation:generateDebugResValues
+> Task :capacitor-screen-orientation:generateDebugResources
+> Task :capacitor-screen-orientation:packageDebugResources
+> Task :capacitor-status-bar:generateDebugResValues
+> Task :capacitor-status-bar:generateDebugResources
+> Task :capacitor-status-bar:packageDebugResources
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :capacitor-android:extractDeepLinksDebug
+> Task :capacitor-app:extractDeepLinksDebug
+> Task :capacitor-browser:extractDeepLinksDebug
+> Task :capacitor-community-keep-awake:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :capacitor-community-speech-recognition:extractDeepLinksDebug
+> Task :capacitor-cordova-android-plugins:extractDeepLinksDebug
+> Task :capacitor-app:processDebugManifest
+> Task :capacitor-community-keep-awake:processDebugManifest
+> Task :capacitor-community-speech-recognition:processDebugManifest
+> Task :capacitor-android:processDebugManifest
+> Task :capacitor-filesystem:extractDeepLinksDebug
+> Task :capacitor-cordova-android-plugins:processDebugManifest
+> Task :app:mergeDebugResources
+> Task :capacitor-browser:processDebugManifest
+> Task :capacitor-haptics:extractDeepLinksDebug
+> Task :capacitor-filesystem:processDebugManifest
+> Task :capacitor-local-notifications:extractDeepLinksDebug
+> Task :capacitor-haptics:processDebugManifest
+> Task :capacitor-screen-orientation:extractDeepLinksDebug
+> Task :capacitor-local-notifications:processDebugManifest
+> Task :capacitor-status-bar:extractDeepLinksDebug
+> Task :capacitor-screen-orientation:processDebugManifest
+> Task :capacitor-status-bar:processDebugManifest
+> Task :capacitor-android:compileDebugLibraryResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :capacitor-app:compileDebugLibraryResources
+> Task :app:processDebugManifestForPackage
+> Task :capacitor-android:parseDebugLocalResources
+> Task :capacitor-app:parseDebugLocalResources
+> Task :capacitor-browser:compileDebugLibraryResources
+> Task :capacitor-community-keep-awake:compileDebugLibraryResources
+> Task :capacitor-browser:parseDebugLocalResources
+> Task :capacitor-app:generateDebugRFile
+> Task :capacitor-android:generateDebugRFile
+> Task :capacitor-community-keep-awake:parseDebugLocalResources
+> Task :capacitor-browser:generateDebugRFile
+> Task :capacitor-community-keep-awake:generateDebugRFile
+> Task :capacitor-community-speech-recognition:compileDebugLibraryResources
+> Task :capacitor-cordova-android-plugins:compileDebugLibraryResources
+> Task :capacitor-community-speech-recognition:parseDebugLocalResources
+> Task :capacitor-filesystem:compileDebugLibraryResources
+> Task :capacitor-cordova-android-plugins:parseDebugLocalResources
+> Task :capacitor-community-speech-recognition:generateDebugRFile
+> Task :capacitor-cordova-android-plugins:generateDebugRFile
+> Task :capacitor-filesystem:parseDebugLocalResources
+> Task :capacitor-haptics:compileDebugLibraryResources
+> Task :capacitor-haptics:parseDebugLocalResources
+> Task :capacitor-filesystem:generateDebugRFile
+> Task :capacitor-local-notifications:compileDebugLibraryResources
+> Task :capacitor-haptics:generateDebugRFile
+> Task :capacitor-screen-orientation:compileDebugLibraryResources
+> Task :capacitor-local-notifications:parseDebugLocalResources
+> Task :capacitor-screen-orientation:parseDebugLocalResources
+> Task :capacitor-status-bar:compileDebugLibraryResources
+> Task :capacitor-local-notifications:generateDebugRFile
+> Task :capacitor-screen-orientation:generateDebugRFile
+> Task :capacitor-android:javaPreCompileDebug
+> Task :capacitor-status-bar:parseDebugLocalResources
+> Task :capacitor-app:javaPreCompileDebug
+> Task :capacitor-status-bar:generateDebugRFile
+
+> Task :capacitor-android:compileDebugJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :capacitor-browser:javaPreCompileDebug
+> Task :capacitor-community-keep-awake:javaPreCompileDebug
+> Task :capacitor-community-speech-recognition:javaPreCompileDebug
+> Task :capacitor-filesystem:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :capacitor-cordova-android-plugins:javaPreCompileDebug
+> Task :capacitor-filesystem:javaPreCompileDebug
+> Task :capacitor-cordova-android-plugins:compileDebugJavaWithJavac NO-SOURCE
+> Task :capacitor-haptics:javaPreCompileDebug
+> Task :capacitor-cordova-android-plugins:bundleLibCompileToJarDebug
+> Task :capacitor-local-notifications:javaPreCompileDebug
+> Task :capacitor-screen-orientation:javaPreCompileDebug
+> Task :capacitor-status-bar:javaPreCompileDebug
+> Task :capacitor-android:bundleLibCompileToJarDebug
+> Task :app:mergeDebugShaders
+> Task :capacitor-app:compileDebugJavaWithJavac
+> Task :capacitor-app:bundleLibCompileToJarDebug
+> Task :capacitor-browser:compileDebugJavaWithJavac
+> Task :capacitor-browser:bundleLibCompileToJarDebug
+> Task :capacitor-community-keep-awake:compileDebugJavaWithJavac
+> Task :app:processDebugResources
+> Task :capacitor-community-keep-awake:bundleLibCompileToJarDebug
+> Task :capacitor-community-speech-recognition:compileDebugJavaWithJavac
+> Task :capacitor-community-speech-recognition:bundleLibCompileToJarDebug
+> Task :capacitor-haptics:compileDebugJavaWithJavac
+> Task :capacitor-haptics:bundleLibCompileToJarDebug
+> Task :capacitor-local-notifications:compileDebugJavaWithJavac
+> Task :capacitor-local-notifications:bundleLibCompileToJarDebug
+> Task :capacitor-screen-orientation:compileDebugJavaWithJavac
+> Task :capacitor-screen-orientation:bundleLibCompileToJarDebug
+> Task :capacitor-status-bar:compileDebugJavaWithJavac
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :capacitor-status-bar:bundleLibCompileToJarDebug
+> Task :capacitor-android:mergeDebugShaders
+> Task :capacitor-android:compileDebugShaders NO-SOURCE
+> Task :capacitor-android:generateDebugAssets UP-TO-DATE
+> Task :capacitor-android:mergeDebugAssets
+> Task :capacitor-app:mergeDebugShaders
+> Task :capacitor-app:compileDebugShaders NO-SOURCE
+> Task :capacitor-app:generateDebugAssets UP-TO-DATE
+> Task :capacitor-app:mergeDebugAssets
+> Task :capacitor-browser:mergeDebugShaders
+> Task :capacitor-browser:compileDebugShaders NO-SOURCE
+> Task :capacitor-browser:generateDebugAssets UP-TO-DATE
+> Task :capacitor-browser:mergeDebugAssets
+> Task :capacitor-community-keep-awake:mergeDebugShaders
+> Task :capacitor-community-keep-awake:compileDebugShaders NO-SOURCE
+> Task :capacitor-community-keep-awake:generateDebugAssets UP-TO-DATE
+> Task :capacitor-community-keep-awake:mergeDebugAssets
+> Task :capacitor-community-speech-recognition:mergeDebugShaders
+> Task :capacitor-community-speech-recognition:compileDebugShaders NO-SOURCE
+> Task :capacitor-community-speech-recognition:generateDebugAssets UP-TO-DATE
+> Task :capacitor-community-speech-recognition:mergeDebugAssets
+> Task :capacitor-cordova-android-plugins:mergeDebugShaders
+> Task :capacitor-cordova-android-plugins:compileDebugShaders NO-SOURCE
+> Task :capacitor-cordova-android-plugins:generateDebugAssets UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:mergeDebugAssets
+> Task :capacitor-filesystem:mergeDebugShaders
+> Task :capacitor-filesystem:compileDebugShaders NO-SOURCE
+> Task :capacitor-filesystem:generateDebugAssets UP-TO-DATE
+> Task :capacitor-filesystem:mergeDebugAssets
+> Task :capacitor-haptics:mergeDebugShaders
+> Task :capacitor-haptics:compileDebugShaders NO-SOURCE
+> Task :capacitor-haptics:generateDebugAssets UP-TO-DATE
+> Task :capacitor-haptics:mergeDebugAssets
+> Task :capacitor-local-notifications:mergeDebugShaders
+> Task :capacitor-local-notifications:compileDebugShaders NO-SOURCE
+> Task :capacitor-local-notifications:generateDebugAssets UP-TO-DATE
+> Task :capacitor-local-notifications:mergeDebugAssets
+> Task :capacitor-screen-orientation:mergeDebugShaders
+> Task :capacitor-screen-orientation:compileDebugShaders NO-SOURCE
+> Task :capacitor-screen-orientation:generateDebugAssets UP-TO-DATE
+> Task :capacitor-screen-orientation:mergeDebugAssets
+> Task :capacitor-status-bar:mergeDebugShaders
+> Task :capacitor-status-bar:compileDebugShaders NO-SOURCE
+> Task :capacitor-status-bar:generateDebugAssets UP-TO-DATE
+> Task :capacitor-status-bar:mergeDebugAssets
+> Task :app:mergeDebugAssets
+> Task :capacitor-community-keep-awake:bundleLibRuntimeToJarDebug
+> Task :capacitor-community-speech-recognition:bundleLibRuntimeToJarDebug
+> Task :capacitor-app:bundleLibRuntimeToJarDebug
+> Task :capacitor-browser:bundleLibRuntimeToJarDebug
+> Task :capacitor-haptics:bundleLibRuntimeToJarDebug
+> Task :capacitor-local-notifications:bundleLibRuntimeToJarDebug
+> Task :capacitor-screen-orientation:bundleLibRuntimeToJarDebug
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToJarDebug
+> Task :capacitor-status-bar:bundleLibRuntimeToJarDebug
+> Task :app:compressDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :capacitor-android:processDebugJavaRes NO-SOURCE
+> Task :capacitor-app:processDebugJavaRes NO-SOURCE
+> Task :capacitor-browser:processDebugJavaRes NO-SOURCE
+> Task :capacitor-community-keep-awake:processDebugJavaRes NO-SOURCE
+> Task :capacitor-community-speech-recognition:processDebugJavaRes NO-SOURCE
+> Task :capacitor-android:bundleLibRuntimeToJarDebug
+> Task :capacitor-cordova-android-plugins:processDebugJavaRes NO-SOURCE
+> Task :capacitor-haptics:processDebugJavaRes NO-SOURCE
+> Task :capacitor-local-notifications:processDebugJavaRes NO-SOURCE
+> Task :capacitor-screen-orientation:processDebugJavaRes NO-SOURCE
+> Task :capacitor-status-bar:processDebugJavaRes NO-SOURCE
+> Task :capacitor-community-keep-awake:bundleLibRuntimeToDirDebug
+> Task :app:checkDebugDuplicateClasses
+> Task :capacitor-app:bundleLibRuntimeToDirDebug
+> Task :capacitor-community-speech-recognition:bundleLibRuntimeToDirDebug
+> Task :capacitor-haptics:bundleLibRuntimeToDirDebug
+> Task :capacitor-browser:bundleLibRuntimeToDirDebug
+> Task :capacitor-local-notifications:bundleLibRuntimeToDirDebug
+> Task :capacitor-screen-orientation:bundleLibRuntimeToDirDebug
+> Task :capacitor-status-bar:bundleLibRuntimeToDirDebug
+> Task :capacitor-cordova-android-plugins:bundleLibRuntimeToDirDebug
+> Task :app:mergeDebugJniLibFolders
+> Task :capacitor-android:mergeDebugJniLibFolders
+> Task :capacitor-android:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-android:copyDebugJniLibsProjectOnly
+> Task :capacitor-app:mergeDebugJniLibFolders
+> Task :capacitor-app:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-app:copyDebugJniLibsProjectOnly
+> Task :capacitor-browser:mergeDebugJniLibFolders
+> Task :capacitor-browser:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-browser:copyDebugJniLibsProjectOnly
+> Task :capacitor-community-keep-awake:mergeDebugJniLibFolders
+> Task :capacitor-community-keep-awake:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-community-keep-awake:copyDebugJniLibsProjectOnly
+> Task :capacitor-community-speech-recognition:mergeDebugJniLibFolders
+> Task :capacitor-community-speech-recognition:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-community-speech-recognition:copyDebugJniLibsProjectOnly
+> Task :capacitor-android:bundleLibRuntimeToDirDebug
+> Task :capacitor-cordova-android-plugins:mergeDebugJniLibFolders
+> Task :capacitor-cordova-android-plugins:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectOnly
+> Task :capacitor-filesystem:mergeDebugJniLibFolders
+> Task :capacitor-filesystem:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-filesystem:copyDebugJniLibsProjectOnly
+> Task :capacitor-haptics:mergeDebugJniLibFolders
+> Task :capacitor-haptics:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-haptics:copyDebugJniLibsProjectOnly
+> Task :capacitor-local-notifications:mergeDebugJniLibFolders
+> Task :capacitor-local-notifications:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-local-notifications:copyDebugJniLibsProjectOnly
+> Task :capacitor-screen-orientation:mergeDebugJniLibFolders
+> Task :capacitor-screen-orientation:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-screen-orientation:copyDebugJniLibsProjectOnly
+> Task :capacitor-status-bar:mergeDebugJniLibFolders
+> Task :capacitor-status-bar:mergeDebugNativeLibs NO-SOURCE
+> Task :capacitor-status-bar:copyDebugJniLibsProjectOnly
+> Task :app:validateSigningDebug
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :capacitor-android:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-android:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-android:checkDebugAarMetadata
+> Task :capacitor-android:extractDebugAnnotations
+> Task :capacitor-android:extractDeepLinksForAarDebug
+> Task :capacitor-android:mergeDebugGeneratedProguardFiles
+> Task :capacitor-android:mergeDebugConsumerProguardFiles
+> Task :capacitor-android:prepareDebugArtProfile
+> Task :capacitor-android:prepareLintJarForPublish
+> Task :capacitor-app:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-app:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-app:checkDebugAarMetadata
+> Task :capacitor-app:extractDebugAnnotations
+> Task :capacitor-app:extractDeepLinksForAarDebug
+> Task :capacitor-app:mergeDebugGeneratedProguardFiles
+> Task :capacitor-app:mergeDebugConsumerProguardFiles
+> Task :capacitor-android:mergeDebugJavaResource
+> Task :capacitor-app:prepareDebugArtProfile
+> Task :capacitor-android:syncDebugLibJars
+> Task :capacitor-android:bundleDebugAar
+> Task :capacitor-android:assembleDebug
+> Task :capacitor-app:prepareLintJarForPublish
+> Task :capacitor-app:mergeDebugJavaResource
+> Task :capacitor-app:syncDebugLibJars
+> Task :capacitor-browser:checkDebugAarMetadata
+> Task :capacitor-app:bundleDebugAar
+> Task :capacitor-app:assembleDebug
+> Task :capacitor-browser:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-browser:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-browser:extractDebugAnnotations
+> Task :capacitor-browser:extractDeepLinksForAarDebug
+> Task :capacitor-browser:mergeDebugGeneratedProguardFiles
+> Task :capacitor-browser:mergeDebugConsumerProguardFiles
+> Task :capacitor-browser:prepareDebugArtProfile
+> Task :capacitor-browser:prepareLintJarForPublish
+> Task :capacitor-browser:mergeDebugJavaResource
+> Task :capacitor-community-keep-awake:checkDebugAarMetadata
+> Task :capacitor-browser:syncDebugLibJars
+> Task :capacitor-browser:bundleDebugAar
+> Task :capacitor-browser:assembleDebug
+> Task :capacitor-community-keep-awake:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-community-keep-awake:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-community-keep-awake:extractDebugAnnotations
+> Task :capacitor-community-keep-awake:extractDeepLinksForAarDebug
+> Task :capacitor-community-keep-awake:mergeDebugGeneratedProguardFiles
+> Task :capacitor-community-keep-awake:mergeDebugConsumerProguardFiles
+> Task :capacitor-community-keep-awake:prepareDebugArtProfile
+> Task :capacitor-community-keep-awake:prepareLintJarForPublish
+> Task :capacitor-community-keep-awake:mergeDebugJavaResource
+> Task :capacitor-community-speech-recognition:checkDebugAarMetadata
+> Task :capacitor-community-keep-awake:syncDebugLibJars
+> Task :capacitor-community-keep-awake:bundleDebugAar
+> Task :capacitor-community-keep-awake:assembleDebug
+> Task :capacitor-community-speech-recognition:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-community-speech-recognition:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-community-speech-recognition:extractDebugAnnotations
+> Task :capacitor-community-speech-recognition:extractDeepLinksForAarDebug
+> Task :capacitor-community-speech-recognition:mergeDebugGeneratedProguardFiles
+> Task :capacitor-community-speech-recognition:mergeDebugConsumerProguardFiles
+> Task :capacitor-community-speech-recognition:prepareDebugArtProfile
+> Task :capacitor-community-speech-recognition:prepareLintJarForPublish
+> Task :capacitor-community-speech-recognition:mergeDebugJavaResource
+> Task :capacitor-cordova-android-plugins:checkDebugAarMetadata
+> Task :capacitor-community-speech-recognition:syncDebugLibJars
+> Task :capacitor-community-speech-recognition:bundleDebugAar
+> Task :capacitor-community-speech-recognition:assembleDebug
+> Task :capacitor-cordova-android-plugins:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-cordova-android-plugins:extractDebugAnnotations
+> Task :capacitor-cordova-android-plugins:extractDeepLinksForAarDebug
+> Task :capacitor-cordova-android-plugins:mergeDebugGeneratedProguardFiles
+> Task :capacitor-cordova-android-plugins:mergeDebugConsumerProguardFiles
+> Task :capacitor-cordova-android-plugins:prepareDebugArtProfile
+> Task :capacitor-cordova-android-plugins:prepareLintJarForPublish
+> Task :capacitor-cordova-android-plugins:mergeDebugJavaResource
+> Task :capacitor-cordova-android-plugins:syncDebugLibJars
+> Task :capacitor-filesystem:checkDebugAarMetadata
+> Task :capacitor-cordova-android-plugins:bundleDebugAar
+> Task :capacitor-cordova-android-plugins:assembleDebug
+> Task :capacitor-filesystem:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-filesystem:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-filesystem:extractDeepLinksForAarDebug
+> Task :capacitor-filesystem:prepareDebugArtProfile
+> Task :capacitor-filesystem:prepareLintJarForPublish
+> Task :capacitor-haptics:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-haptics:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-haptics:checkDebugAarMetadata
+> Task :capacitor-haptics:extractDebugAnnotations
+> Task :capacitor-haptics:extractDeepLinksForAarDebug
+> Task :capacitor-haptics:mergeDebugGeneratedProguardFiles
+> Task :capacitor-haptics:mergeDebugConsumerProguardFiles
+> Task :capacitor-haptics:prepareDebugArtProfile
+> Task :capacitor-haptics:prepareLintJarForPublish
+> Task :capacitor-haptics:mergeDebugJavaResource
+> Task :capacitor-local-notifications:checkDebugAarMetadata
+> Task :capacitor-haptics:syncDebugLibJars
+> Task :capacitor-haptics:bundleDebugAar
+> Task :capacitor-haptics:assembleDebug
+> Task :capacitor-local-notifications:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-local-notifications:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-local-notifications:extractDebugAnnotations
+> Task :capacitor-local-notifications:extractDeepLinksForAarDebug
+> Task :capacitor-local-notifications:mergeDebugGeneratedProguardFiles
+> Task :capacitor-local-notifications:mergeDebugConsumerProguardFiles
+> Task :capacitor-local-notifications:prepareDebugArtProfile
+> Task :capacitor-local-notifications:prepareLintJarForPublish
+> Task :capacitor-local-notifications:mergeDebugJavaResource
+> Task :capacitor-screen-orientation:checkDebugAarMetadata
+> Task :app:mergeExtDexDebug
+> Task :capacitor-local-notifications:syncDebugLibJars
+> Task :capacitor-local-notifications:bundleDebugAar
+> Task :capacitor-local-notifications:assembleDebug
+> Task :capacitor-screen-orientation:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-screen-orientation:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-screen-orientation:extractDebugAnnotations
+> Task :capacitor-screen-orientation:extractDeepLinksForAarDebug
+> Task :capacitor-screen-orientation:mergeDebugGeneratedProguardFiles
+> Task :capacitor-screen-orientation:mergeDebugConsumerProguardFiles
+> Task :capacitor-screen-orientation:prepareDebugArtProfile
+> Task :capacitor-screen-orientation:prepareLintJarForPublish
+> Task :capacitor-screen-orientation:mergeDebugJavaResource
+> Task :capacitor-status-bar:checkDebugAarMetadata
+> Task :capacitor-screen-orientation:syncDebugLibJars
+> Task :capacitor-screen-orientation:bundleDebugAar
+> Task :capacitor-screen-orientation:assembleDebug
+> Task :capacitor-status-bar:stripDebugDebugSymbols NO-SOURCE
+> Task :capacitor-status-bar:copyDebugJniLibsProjectAndLocalJars
+> Task :capacitor-status-bar:extractDebugAnnotations
+> Task :capacitor-status-bar:extractDeepLinksForAarDebug
+> Task :capacitor-status-bar:mergeDebugGeneratedProguardFiles
+> Task :capacitor-status-bar:mergeDebugConsumerProguardFiles
+> Task :capacitor-status-bar:prepareDebugArtProfile
+> Task :capacitor-status-bar:prepareLintJarForPublish
+> Task :capacitor-status-bar:mergeDebugJavaResource
+> Task :capacitor-status-bar:syncDebugLibJars
+> Task :capacitor-status-bar:bundleDebugAar
+> Task :capacitor-status-bar:assembleDebug
+
+> Task :capacitor-filesystem:compileDebugKotlin
+w: file:///C:/Users/user/Desktop/CineMovie/node_modules/@capacitor/filesystem/android/src/main/kotlin/com/capacitorjs/plugins/filesystem/FilesystemPlugin.kt:335:31 'fun downloadFile(call: PluginCall): Unit' is deprecated. Use @capacitor/file-transfer plugin instead.
+w: file:///C:/Users/user/Desktop/CineMovie/node_modules/@capacitor/filesystem/android/src/main/kotlin/com/capacitorjs/plugins/filesystem/LegacyFilesystemImplementation.kt:66:29 Java type mismatch: inferred type is 'String?', but 'String' was expected.
+
+> Task :capacitor-filesystem:compileDebugJavaWithJavac NO-SOURCE
+> Task :capacitor-filesystem:bundleLibCompileToJarDebug
+> Task :capacitor-filesystem:bundleLibRuntimeToJarDebug
+> Task :capacitor-filesystem:processDebugJavaRes
+> Task :app:compileDebugJavaWithJavac
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics
+> Task :app:mergeProjectDexDebug
+> Task :capacitor-filesystem:extractDebugAnnotations
+> Task :capacitor-filesystem:mergeDebugGeneratedProguardFiles
+> Task :capacitor-filesystem:bundleLibRuntimeToDirDebug
+> Task :capacitor-filesystem:mergeDebugConsumerProguardFiles
+> Task :capacitor-filesystem:mergeDebugJavaResource
+> Task :capacitor-filesystem:syncDebugLibJars
+> Task :capacitor-filesystem:bundleDebugAar
+> Task :capacitor-filesystem:assembleDebug
+> Task :app:mergeLibDexDebug
+> Task :app:mergeDebugJavaResource
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+
+[Incubating] Problems report is available at: file:///C:/Users/user/Desktop/CineMovie/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 18s
+364 actionable tasks: 364 executed

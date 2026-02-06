@@ -1,3 +1,4 @@
+import './patch.js';
 import express from 'express';
 import cors from 'cors';
 import { HiAnime } from 'aniwatch';
@@ -7,38 +8,7 @@ import os from 'os';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// RETRY HELPER
-const withRetry = async (fn, attempts = 3, delay = 1000) => {
-    let lastError = null;
-    for (let i = 0; i < attempts; i++) {
-        try {
-            return await fn();
-        } catch (err) {
-            lastError = err;
-            console.warn(`[Kitsune] Attempt ${i + 1}/${attempts} failed: ${err.message}`);
-            if (i < attempts - 1) await new Promise(r => setTimeout(r, delay));
-        }
-    }
-    throw lastError;
-};
-
-const corsOptions = {
-    origin: true,
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'Bypass-Tunnel-Reminder']
-};
-
-app.options('*', cors(corsOptions));
-app.use(cors(corsOptions));
-app.use(express.json());
-
-// Diagnostic Header
-app.use((req, res, next) => {
-    res.setHeader('X-Proxy-Version', '1.1.4');
-    console.log(`[Proxy 1.1.4] ${req.method} ${req.url}`);
-    next();
-});
-
+// ... (Rest of the file remains same, but now uses the patched axios/fetch)
 const hianime = new HiAnime.Scraper();
 
 // Utility for internal recursion (M3U8 segments)
@@ -115,15 +85,15 @@ app.get('/sources', async (req, res) => {
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`[Proxy 1.1.3] Fetching Sources (Attempt ${attempt}): ${id} | Server: ${serverId}`);
+      console.log(`[Proxy 1.1.4] Fetching Sources (Manual): ${id} | Server: ${serverId}`);
       
-      const data = await hianime.getEpisodeSources(id, String(serverId), (category) || 'sub');
+      const data = await getSourcesManual(id, String(serverId));
       
       if (data && data.sources && Array.isArray(data.sources)) {
           const selfUrl = getInternalSelfUrl(req);
-          const headers = data.headers || {};
-          const referer = headers.Referer || 'https://hianime.to/';
-          const agent = headers['User-Agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
+          // Standard headers for HiAnime
+          const referer = 'https://hianime.to/';
+          const agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
           
           data.sources = data.sources.map((src) => ({
               ...src,
@@ -134,10 +104,7 @@ app.get('/sources', async (req, res) => {
               headers: { 
                   'Referer': referer, 
                   'User-Agent': agent,
-                  'Origin': (() => {
-                      try { return new URL(referer).origin; }
-                      catch(e) { return 'https://hianime.to'; }
-                  })()
+                  'Origin': 'https://hianime.to'
               }
           }));
       }
@@ -184,12 +151,183 @@ app.get('/', (req, res) => {
       status: 'Local Anime Proxy Running', 
       version: '1.1.4',
       time: new Date().toISOString(),
-      vercel: !!process.env.VERCEL
+      vercel: !!process.env.VERCEL,
+      proxy: process.env.PRIVATE_PROXY_URL ? 'Private (Cloudflare)' : 'Public (AllOrigins)'
   });
 });
 
-app.get('/check-version', (req, res) => {
-    res.json({ version: '1.1.4', status: 'ready' });
+app.get('/debug/proxy-test', async (req, res) => {
+    try {
+        const testUrl = 'https://hianime.to/ajax/v2/episode/servers?episodeId=121408';
+        const data = await fetchViaProxy(testUrl);
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// --- MANUAL SCRAPER UTILITIES (For Cloud Bypass) ---
+import crypto from 'crypto';
+
+const MECACLOUD_URLS = {
+    script: "https://megacloud.tv/js/player/a/prod/e1-player.min.js?v=",
+    sources: "https://megacloud.tv/embed-2/ajax/e-1/getSources?id="
+};
+
+async function fetchViaProxy(url, options = {}) {
+    const privateProxy = process.env.PRIVATE_PROXY_URL;
+    let proxyUrl;
+    
+    if (privateProxy) {
+        // Use user's private Cloudflare Worker
+        const base = privateProxy.endsWith('/') ? privateProxy.slice(0, -1) : privateProxy;
+        proxyUrl = `${base}?url=${encodeURIComponent(url)}`;
+        console.log(`[PrivateProxy] ${url}`);
+    } else {
+        // Fallback to AllOrigins (public, often blocked)
+        proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        console.log(`[PublicProxy] ${url}`);
+    }
+
+    const res = await fetch(proxyUrl, options);
+    const data = await res.json();
+    
+    const content = data.contents || data.result; // Handle different proxy response formats
+    if (!content) throw new Error("No contents from proxy");
+    
+    try {
+        return typeof content === 'string' ? JSON.parse(content) : content;
+    } catch (e) {
+        return content;
+    }
+}
+
+async function extractMegaCloud(videoUrl) {
+    try {
+        const videoId = videoUrl.split('/').pop()?.split('?')[0];
+        console.log(`[ManualScraper] Extracting MegaCloud: ${videoId}`);
+        
+        const srcsData = await fetchViaProxy(`${MECACLOUD_URLS.sources}${videoId}`);
+        if (!srcsData || !srcsData.sources) throw new Error("Failed to get MegaCloud sources");
+
+        if (!srcsData.encrypted && Array.isArray(srcsData.sources)) {
+            return {
+                sources: srcsData.sources.map(s => ({ url: s.file, type: s.type })),
+                tracks: srcsData.tracks || [],
+                intro: srcsData.intro,
+                outro: srcsData.outro
+            };
+        }
+
+        const scriptText = await fetchViaProxy(`${MECACLOUD_URLS.script}${Date.now()}`);
+
+        const regex = /case\s*0x[0-9a-f]+:(?![^;]*=partKey)\s*\w+\s*=\s*(\w+)\s*,\s*\w+\s*=\s*(\w+);/g;
+        const matches = [...scriptText.matchAll(regex)];
+        const vars = matches.map(match => {
+            const findKey = (key) => {
+                const r = new RegExp(`var ${key}\\s*=\\s*([^,;]+)`, 'g');
+                return r.exec(scriptText)?.[1];
+            };
+            return [parseInt(findKey(match[1]), 16), parseInt(findKey(match[2]), 16)];
+        }).filter(v => v.length > 0);
+
+        if (!vars.length) throw new Error("Failed to extract decryption variables");
+
+        const getSecret = (encryptedString, values) => {
+            let secret = "", encryptedSource = "", encryptedSourceArray = encryptedString.split(""), currentIndex = 0;
+            for (const index of values) {
+                const start = index[0] + currentIndex;
+                const end = start + index[1];
+                for (let i = start; i < end; i++) {
+                    secret += encryptedString[i];
+                    encryptedSourceArray[i] = "";
+                }
+                currentIndex += index[1];
+            }
+            encryptedSource = encryptedSourceArray.join("");
+            return { secret, encryptedSource };
+        };
+
+        const { secret, encryptedSource } = getSecret(srcsData.sources, vars);
+        
+        const decrypt = (encrypted, secret) => {
+            const cypher = Buffer.from(encrypted, "base64");
+            const salt = cypher.subarray(8, 16);
+            const password = Buffer.concat([Buffer.from(secret, "binary"), salt]);
+            const md5Hashes = [];
+            let digest = password;
+            for (let i = 0; i < 3; i++) {
+                md5Hashes[i] = crypto.createHash("md5").update(digest).digest();
+                digest = Buffer.concat([md5Hashes[i], password]);
+            }
+            const key = Buffer.concat([md5Hashes[0], md5Hashes[1]]);
+            const iv = md5Hashes[2];
+            const contents = cypher.subarray(16);
+            const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+            let decrypted = decipher.update(contents, "binary", "utf8");
+            decrypted += decipher.final("utf8");
+            return decrypted;
+        };
+
+        const decrypted = decrypt(encryptedSource, secret);
+        const sources = JSON.parse(decrypted);
+
+        return {
+            sources: sources.map(s => ({ url: s.file, type: s.type })),
+            tracks: srcsData.tracks || [],
+            intro: srcsData.intro,
+            outro: srcsData.outro
+        };
+    } catch (err) {
+        console.error("[ManualScraper] MegaCloud failed:", err.message);
+        throw err;
+    }
+}
+
+async function getSourcesManual(episodeId, serverName = "vidcloud") {
+    const domains = ["https://hianime.to", "https://hianimez.to"];
+    let lastErr;
+
+    for (const domain of domains) {
+        try {
+            const epNumericId = episodeId.split('=')[1] || episodeId;
+            console.log(`[ManualScraper] Scraping ${domain} for Ep: ${epNumericId}`);
+
+            const serversData = await fetchViaProxy(`${domain}/ajax/v2/episode/servers?episodeId=${epNumericId}`);
+            if (!serversData || !serversData.html) continue;
+            
+            const html = serversData.html;
+            const serverMatches = [...html.matchAll(/data-id="([0-9]+)"[^>]*>([^<]+)/g)];
+            const servers = serverMatches.map(m => ({ id: m[1], name: m[2].trim().toLowerCase() }));
+            
+            const targetServer = servers.find(s => s.name.includes(serverName.toLowerCase())) || servers[0];
+            if (!targetServer) continue;
+
+            const sourceData = await fetchViaProxy(`${domain}/ajax/v2/episode/sources?id=${targetServer.id}`);
+            if (!sourceData) continue;
+            
+            if (sourceData.type === 'iframe') {
+                return await extractMegaCloud(sourceData.link);
+            }
+            
+            return sourceData;
+        } catch (err) {
+            lastErr = err;
+            console.warn(`[ManualScraper] ${domain} failed:`, err.message);
+        }
+    }
+    
+    throw lastErr || new Error("All domains failed in manual scraper");
+}
+
+app.get('/test-patch', async (req, res) => {
+    try {
+        console.log('[TestPatch] Triggering Manual Scrape...');
+        const data = await getSourcesManual('121408', 'vidcloud');
+        res.json({ success: true, data });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 app.get('/my-ip', (req, res) => {
@@ -369,17 +507,15 @@ app.get('/episode/sources', async (req, res) => {
     console.log(`[Kitsune] Fetching Sources: ${animeEpisodeId} | Server: ${server}`);
     
     try {
-        const data = await withRetry(() => hianime.getEpisodeSources(
+        const data = await getSourcesManual(
             String(animeEpisodeId), 
-            String(server || 'vidcloud'), 
-            String(category || 'sub')
-        ));
+            String(server || 'vidcloud')
+        );
         
         if (data && data.sources && Array.isArray(data.sources)) {
             const selfUrl = getInternalSelfUrl(req);
-            const headers = data.headers || {};
-            const referer = headers.Referer || 'https://hianime.to/';
-            const agent = headers['User-Agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
+            const referer = 'https://hianime.to/';
+            const agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
             
             data.sources = data.sources.map((src) => ({
                 ...src,

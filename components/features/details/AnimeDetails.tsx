@@ -11,6 +11,7 @@ import CharacterCard from '@/components/common/character-card';
 import AnimeCard from '@/components/anime-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ROUTES } from '@/constants/routes';
+import { ServerManager } from '../../../utils/server-manager';
 import { ChevronLeft, Play, Info, Heart, Share2, MoreHorizontal, Subtitles, Mic, Plus } from 'lucide-react';
 import { COLORS } from '../../../constants';
 import BlurFade from '@/components/ui/blur-fade';
@@ -33,12 +34,12 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
   const [activeServer, setActiveServer] = useState<string | undefined>(undefined);
   
   const animeId = anime.id.toString();
-  const { data: details, isLoading: detailsLoading } = useGetAnimeDetails(animeId);
-  const { data: episodesData, isLoading: episodesLoading } = useGetAllEpisodes(animeId);
+  const { data: details, isLoading: detailsLoading, error: detailsError } = useGetAnimeDetails(animeId);
+  const { data: episodesData, isLoading: episodesLoading, error: episodesError } = useGetAllEpisodes(animeId);
   const { data: banner, isLoading: bannerLoading } = useGetAnimeBanner(details?.anime.info.anilistId!);
   
   const { data: serversData, isLoading: serversLoading } = useGetEpisodeServers(selectedEpisodeId!);
-  const { data: episodeData, isLoading: episodeDataLoading } = useGetEpisodeData(
+  const { data: episodeData, isLoading: episodeDataLoading, error: episodeDataError } = useGetEpisodeData(
     selectedEpisodeId!,
     activeServer || serversData?.sub?.[0]?.serverName || serversData?.dub?.[0]?.serverName,
     subOrDub
@@ -71,10 +72,37 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
     id: animeId
   }), [info?.info?.name, info?.info?.poster, animeId, anime.name, anime.title, anime.image, anime.poster]);
 
+  if (detailsError) {
+    return (
+      <div className="fixed inset-0 z-[4000] bg-[#0a0a0a] flex flex-col items-center justify-center p-6 text-center">
+        <div className="text-red-500 mb-4 text-4xl">⚠️</div>
+        <h2 className="text-xl font-bold text-white mb-2">Connection Error</h2>
+        <p className="text-white/60 mb-6 max-w-sm">
+          {((detailsError as any)?.response?.data?.message) || 'Could not connect to the anime server. Please check your connection or try a different server in Settings.'}
+        </p>
+        <Button onClick={handleBack} variant="outline" className="border-white/20 text-white">
+          Go Back
+        </Button>
+      </div>
+    );
+  }
+
+  const [currentServer, setCurrentServer] = useState<string>('');
+
+  useEffect(() => {
+    ServerManager.getUrl().then(setCurrentServer);
+  }, []);
+
   if (detailsLoading || !details) {
     return (
-      <div className="fixed inset-0 z-[4000] bg-[#0a0a0a] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+      <div className="fixed inset-0 z-[4000] bg-[#0a0a0a] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4" />
+        <div className="text-white/40 text-[10px] font-mono tracking-tighter uppercase mb-1">
+          Connecting to Cloud
+        </div>
+        <div className="text-white/20 text-[9px] font-mono max-w-[200px] truncate">
+          {currentServer || 'Discovering...'}
+        </div>
       </div>
     );
   }

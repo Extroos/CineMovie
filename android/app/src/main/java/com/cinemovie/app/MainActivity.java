@@ -1,4 +1,4 @@
-package com.freshcart.app;
+package com.cinemovie.app;
 
 import com.getcapacitor.BridgeActivity;
 
