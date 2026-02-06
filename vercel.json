@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/hianime/(.*)",
+      "destination": "https://server-blue-delta.vercel.app/$1"
+    },
+    {
+      "source": "/proxy",
+      "destination": "https://server-blue-delta.vercel.app/proxy"
+    }
+  ]
+}

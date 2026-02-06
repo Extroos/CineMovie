@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/lib/*": ["./kitsune-lib/*"],
+      "@/components/*": ["./kitsune-components/*"],
+      "@/hooks/*": ["./kitsune-hooks/*"],
+      "@/query/*": ["./kitsune-query/*"],
+      "@/mutation/*": ["./kitsune-mutation/*"],
+      "@/providers/*": ["./kitsune-providers/*"],
+      "@/services/*": ["./kitsune-services/*"],
+      "@/contexts/*": ["./kitsune-contexts/*"],
+      "@/assets/*": ["./kitsune-assets/*"],
+      "@/configs/*": ["./kitsune-configs/*"],
+      "@/types/*": ["./kitsune-types/*"],
+      "@/utils/*": ["./kitsune-utils/*"],
+      "@/store/*": ["./kitsune-store/*"],
+      "@/constants/*": ["./kitsune-constants/*"],
+      "@/icons/*": ["./kitsune-icons/*"],
+      "@/*": ["./*"],
+      "next/link": ["./kitsune-lib/shims/link.tsx"],
+      "next/image": ["./kitsune-lib/shims/image.tsx"],
+      "next-runtime-env": ["./kitsune-lib/shims/env.ts"],
+      "next/font/local": ["./kitsune-lib/shims/font/local.tsx"]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
