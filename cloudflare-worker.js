@@ -1,6 +1,6 @@
 /**
- * CINE-MOVIE UNIFIED WORKER v1.3.4 (ULTIMATE Master)
- * Full-Spectrum Id Resolution + Block-Aware Scraper + VidSrc Fixed.
+ * CINE-MOVIE UNIFIED WORKER v1.3.5 (SUPREME Master)
+ * Safe-Link Decoding + Block-Aware Scraper + VidSrc Fixed.
  */
 
 export default {
@@ -31,8 +31,8 @@ export default {
             if (path === '/home') return handleHome(respond);
             if (path === '/search') return handleSearch(url, respond);
             if (path === '/schedule') return handleSchedule(url, respond);
-            if (path.startsWith('/info/')) return handleInfo(path.replace('/info/', ''), respond);
-            if (path.startsWith('/episodes/')) return handleEpisodes(path.replace('/episodes/', ''), respond);
+            if (path.startsWith('/info/')) return handleInfo(decodeURIComponent(path.replace('/info/', '')), respond);
+            if (path.startsWith('/episodes/')) return handleEpisodes(decodeURIComponent(path.replace('/episodes/', '')), respond);
             if (path.startsWith('/servers/')) return handleServers(path.split('/').pop(), respond);
             if (path === '/sources') return handleSources(url, request, respond);
             if (path.startsWith('/vidsrc/')) return handleVidSrc(path, respond);
@@ -40,14 +40,14 @@ export default {
             // Kitsune/Mobile Compat
             if (path.startsWith('/anime/')) {
                 const parts = path.split('/');
-                const id = parts[2];
+                const id = decodeURIComponent(parts[2]);
                 if (path.endsWith('/episodes')) return handleEpisodes(id, respond);
                 return handleInfo(id, respond);
             }
             if (path === '/episode/servers') return handleServers(url.searchParams.get('animeEpisodeId'), respond);
             if (path === '/episode/sources') return handleSources(url, request, respond);
 
-            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.4' });
+            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.5' });
             return respond({ error: 'Route Not Found', path }, 404);
         } catch (e) {
             return respond({ error: 'Worker Interior Error', message: e.message, data: {} }, 200);
@@ -75,7 +75,7 @@ async function fetchSafe(url) {
 function cleanText(t) { return t?.replace(/<[^>]*>/g, '').trim(); }
 function cleanId(id) { 
     if (!id) return '';
-    return id.replace('/watch/', '').replace(/^\//, ''); 
+    return id.replace('/watch/', '').replace(/^\//, '').split('?')[0]; 
 }
 
 async function handleHome(respond) {
@@ -151,8 +151,7 @@ async function handleSearch(url, respond) {
 }
 
 async function handleInfo(id, respond) {
-    const target = id.startsWith('watch/') ? `/${id}` : `/${id}`;
-    const html = await fetchSafe(target);
+    const html = await fetchSafe(`/${id}`);
     const mock = { info: { id, name: id, poster: '', description: '', stats: { rating: 'PG-13', quality: 'HD', episodes: { sub: 0, dub: 0 } }, charactersVoiceActors: [], recommendedAnimes: [] }, moreInfo: { genres: [], status: 'Released' } };
     if (!html) return respond({ data: { anime: mock } });
     try {

@@ -1,8 +1,8 @@
-/watch/* /index.html 200
-/info/* /index.html 200
-/anime/* /index.html 200
-/search /index.html 200
-/schedule /index.html 200
-/news /index.html 200
-/settings /index.html 200
-/profile /index.html 200
+/watch/* / 200
+/info/* / 200
+/anime/* / 200
+/search / 200
+/schedule / 200
+/news / 200
+/settings / 200
+/profile / 200
