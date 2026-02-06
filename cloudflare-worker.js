@@ -1,6 +1,6 @@
 /**
- * CINE-MOVIE UNIFIED WORKER v1.3.2 (ULTRA-MASTER)
- * Block-Aware Scraper + Schedule + VidSrc Fixed + Redirects Safe.
+ * CINE-MOVIE UNIFIED WORKER v1.3.3 (MASTER STABILITY)
+ * Block-Aware Scraper + Id Normalization + VidSrc Fixed.
  */
 
 export default {
@@ -46,7 +46,7 @@ export default {
             if (path === '/episode/servers') return handleServers(url.searchParams.get('animeEpisodeId'), respond);
             if (path === '/episode/sources') return handleSources(url, request, respond);
 
-            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.2' });
+            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.3' });
             return respond({ error: 'Route Not Found' }, 404);
         } catch (e) {
             return respond({ error: 'Worker Interior Error', message: e.message, data: {} }, 200);
@@ -72,25 +72,26 @@ async function fetchSafe(url) {
 }
 
 function cleanText(t) { return t?.replace(/<[^>]*>/g, '').trim(); }
+function cleanId(id) { return id?.replace('/watch/', '').replace('/', ''); }
 
 async function handleHome(respond) {
     const html = await fetchSafe('/home');
     if (!html) return respond({ data: { spotlightAnimes: [], trendingAnimes: [], latestEpisodeAnimes: [], topUpcomingAnimes: [] } });
 
     // 1. Spotlight (Big Slider)
-    const spotlights = [...html.matchAll(/<div class="deslide-item">([\s\S]*?)<div class="desi-buttons">/g)].map(item => {
+    const spotlights = [...html.matchAll(/<div class="deslide-item">([\s\S]*?)Detail<i/g)].map(item => {
         const h = item[1];
         return {
-            id: h.match(/href="\/(.+?)"/)?.[1],
+            id: cleanId(h.match(/href="\/(.+?)"/)?.[1]),
             name: cleanText(h.match(/class="desi-head-title dynamic-name"[\s\S]*?>(.+?)<\/div>/)?.[1]),
             poster: h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1]
         };
     }).filter(x => x.id && x.name);
 
     // 2. Trending
-    const trendings = [...html.matchAll(/<div class="swiper-slide item-qtip"[\s\S]*?>([\s\S]*?)<div class="clearfix"><\/div>/g)].map(item => {
+    const trendings = [...html.matchAll(/<div class="swiper-slide item-qtip"[\s\S]*?>([\s\S]*?)<\/div>\s*<\/div>/g)].map(item => {
         const h = item[1];
-        const id = h.match(/href="\/(.+?)"/)?.[1];
+        const id = cleanId(h.match(/href="\/(.+?)"/)?.[1]);
         const name = cleanText(h.match(/class="film-title dynamic-name"[\s\S]*?>(.+?)<\/div>/)?.[1]);
         const poster = h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1];
         return { id, name, poster };
@@ -99,7 +100,7 @@ async function handleHome(respond) {
     // 3. Grids (Latest, Airing, etc.)
     const gridItems = [...html.matchAll(/<(?:div class="flw-item"|li)>([\s\S]*?)<div class="film-detail">([\s\S]*?)<\/div>/g)].map(item => {
         const h = item[0];
-        const id = h.match(/href="\/(.+?)"/)?.[1];
+        const id = cleanId(h.match(/href="\/(.+?)"/)?.[1]);
         const name = cleanText(h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1]);
         const poster = h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1];
         return { id, name, poster };
@@ -124,7 +125,7 @@ async function handleSchedule(url, respond) {
         const h = item[1];
         return {
             time: cleanText(h.match(/class="time">(.+?)<\/div>/)?.[1]),
-            id: h.match(/href="\/(.+?)"/)?.[1],
+            id: cleanId(h.match(/href="\/(.+?)"/)?.[1]),
             name: cleanText(h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1])
         };
     }).filter(x => x.id);
@@ -138,7 +139,7 @@ async function handleSearch(url, respond) {
     const animes = [...html.matchAll(/<div class="flw-item">([\s\S]*?)<div class="film-detail">([\s\S]*?)<\/div>/g)].map(item => {
         const h = item[0];
         return {
-            id: h.match(/href="\/(.+?)"/)?.[1],
+            id: cleanId(h.match(/href="\/(.+?)"/)?.[1]),
             name: cleanText(h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1]),
             poster: h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1]
         };
