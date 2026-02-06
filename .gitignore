@@ -17,7 +17,7 @@ build
 out
 
 # Environment variables / Secrets
-.env
+# .env is explicitly included per user request for GitHub builds
 .env.local
 .env.*.local
 *.suo
