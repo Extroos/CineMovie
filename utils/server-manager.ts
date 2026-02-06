@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 
 // Hybrid Hosting: Custom -> Local -> Cloud
-const FALLBACK_CLOUD = 'https://server-blue-delta.vercel.app'; // Default Vercel Project Name
+const FALLBACK_CLOUD = 'https://cinemovie-proxy.abderrahmanchakkouri.workers.dev'; // Unified Cloudflare Worker
 export const isNative = Capacitor.isNativePlatform();
 const CURRENT_VERSION = '1.1.4';
 
@@ -97,7 +97,12 @@ export const ServerManager = {
         
         const isCloudHost = !isNative && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('workers.dev'));
         if (isCloudHost) {
-            // Priority: Verify if the /hianime proxy is actually alive (Vercel deployment)
+            // Prioritize Unified Cloudflare Worker
+            if (window.location.hostname.includes('workers.dev')) {
+                return FALLBACK_CLOUD;
+            }
+
+            // Fallback for Vercel
             try {
                 const res = await fetch('/hianime/home', { signal: AbortSignal.timeout(1500) });
                 if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
@@ -105,7 +110,6 @@ export const ServerManager = {
                 }
             } catch (e) {}
             
-            // If on workers.dev or proxy test failed, use absolute Vercel link
             return FALLBACK_CLOUD;
         }
         
