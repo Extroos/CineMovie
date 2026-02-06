@@ -177,7 +177,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                 <img
                   src={bannerImage}
-                  alt={info.info.name}
+                  alt={info?.info?.name || 'Anime Banner'}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -218,7 +218,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                 textShadow: '0 4px 12px rgba(0,0,0,0.6)',
                 letterSpacing: '-0.02em',
               }} className="italic uppercase">
-                {info.info.name}
+                {info?.info?.name || anime?.name || anime?.title || 'Unknown Anime'}
               </h1>
 
               {/* Metadata */}
@@ -232,23 +232,23 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                 fontWeight: 700,
                 color: '#e5e5e5',
               }}>
-                 <span style={{ color: '#46d369' }}>
-                   {info.info.stats.rating} Match
-                 </span>
-                 <span>{info.moreInfo.aired?.split(',')[1]?.trim() || info.moreInfo.aired}</span>
-                 <span style={{ opacity: 0.5 }}>|</span>
-                 <span>{info.info.stats.quality}</span>
-                 <span style={{ opacity: 0.5 }}>|</span>
-                 <div className="flex items-center gap-1">
-                    <Subtitles className="w-3.5 h-3.5" />
-                    <span>{info.info.stats.episodes.sub}</span>
-                 </div>
-                 {info.info.stats.episodes.dub > 0 && (
-                    <div className="flex items-center gap-1">
-                        <Mic className="w-3.5 h-3.5" />
-                        <span>{info.info.stats.episodes.dub}</span>
-                    </div>
-                 )}
+                  <span style={{ color: '#46d369' }}>
+                    {info?.info?.stats?.rating || '0'} Match
+                  </span>
+                  <span>{info?.moreInfo?.aired?.split(',')[1]?.trim() || info?.moreInfo?.aired || 'N/A'}</span>
+                  <span style={{ opacity: 0.5 }}>|</span>
+                  <span>{info?.info?.stats?.quality || 'HD'}</span>
+                  <span style={{ opacity: 0.5 }}>|</span>
+                  <div className="flex items-center gap-1">
+                     <Subtitles className="w-3.5 h-3.5" />
+                     <span>{info?.info?.stats?.episodes?.sub || 0}</span>
+                  </div>
+                  {(info?.info?.stats?.episodes?.dub || 0) > 0 && (
+                     <div className="flex items-center gap-1">
+                         <Mic className="w-3.5 h-3.5" />
+                         <span>{info?.info?.stats?.episodes?.dub || 0}</span>
+                     </div>
+                  )}
               </div>
 
               {/* Action Buttons */}
@@ -336,14 +336,14 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>Synopsis</h3>
-                        <p style={{ 
-                           fontSize: '1.05rem', 
-                           lineHeight: '1.6', 
-                           color: 'rgba(255,255,255,0.8)', 
-                           fontWeight: 500
-                         }}>
-                           {info.info.description}
-                        </p>
+                         <p style={{ 
+                            fontSize: '1.05rem', 
+                            lineHeight: '1.6', 
+                            color: 'rgba(255,255,255,0.8)', 
+                            fontWeight: 500
+                          }}>
+                            {info?.info?.description || anime?.description || 'No description available.'}
+                         </p>
                     </div>
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
@@ -365,11 +365,11 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', opacity: 0.8 }}>
                         <div>
                             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Studios</span>
-                            <p style={{ color: '#fff', fontWeight: 600 }}>{info.moreInfo.studios}</p>
+                            <p style={{ color: '#fff', fontWeight: 600 }}>{info?.moreInfo?.studios || 'N/A'}</p>
                         </div>
                         <div>
                             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Status</span>
-                            <p style={{ color: '#fff', fontWeight: 600 }}>{info.moreInfo.status}</p>
+                            <p style={{ color: '#fff', fontWeight: 600 }}>{info?.moreInfo?.status || 'N/A'}</p>
                         </div>
                     </div>
                  </div>
@@ -388,40 +388,40 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                             scrollSnapType: 'x mandatory',
                             WebkitOverflowScrolling: 'touch',
                           }} className="no-scrollbar">
-                           {info.info.charactersVoiceActors.slice(0, 15).map((char, idx) => (
-                              <div 
-                                 key={idx} 
-                                 style={{ 
-                                   width: '100px',
-                                   flexShrink: 0,
-                                   scrollSnapAlign: 'start',
-                                   textAlign: 'center'
-                                 }}
-                              >
-                                 <img 
-                                   src={char.character.poster}
-                                   alt={char.character.name}
-                                   style={{
-                                     width: '100px',
-                                     height: '100px',
-                                     borderRadius: '50%',
-                                     objectFit: 'cover',
-                                     border: '2px solid rgba(255, 255, 255, 0.1)',
-                                     boxShadow: '0 8px 20px rgba(0,0,0,0.4)',
-                                     marginBottom: '10px'
-                                   }}
-                                 />
-                                 <div style={{
-                                     fontSize: '0.8rem',
-                                     fontWeight: 700,
-                                     color: '#e5e5e5',
-                                     lineHeight: 1.2,
-                                     wordBreak: 'break-word',
-                                 }}>
-                                   {char.character.name}
-                                 </div>
-                              </div>
-                           ))}
+                            {info?.info?.charactersVoiceActors?.slice(0, 15).map((char, idx) => (
+                               <div 
+                                  key={idx} 
+                                  style={{ 
+                                    width: '100px',
+                                    flexShrink: 0,
+                                    scrollSnapAlign: 'start',
+                                    textAlign: 'center'
+                                  }}
+                               >
+                                  <img 
+                                    src={char.character.poster}
+                                    alt={char.character.name}
+                                    style={{
+                                      width: '100px',
+                                      height: '100px',
+                                      borderRadius: '50%',
+                                      objectFit: 'cover',
+                                      border: '2px solid rgba(255, 255, 255, 0.1)',
+                                      boxShadow: '0 8px 20px rgba(0,0,0,0.4)',
+                                      marginBottom: '10px'
+                                    }}
+                                  />
+                                  <div style={{
+                                      fontSize: '0.8rem',
+                                      fontWeight: 700,
+                                      color: '#e5e5e5',
+                                      lineHeight: 1.2,
+                                      wordBreak: 'break-word',
+                                  }}>
+                                    {char.character.name}
+                                  </div>
+                               </div>
+                            ))}
                         </div>
                       </div>
                     )}
