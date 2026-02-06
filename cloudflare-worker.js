@@ -1,6 +1,6 @@
 /**
- * CINE-MOVIE UNIFIED WORKER v1.3.5 (SUPREME Master)
- * Safe-Link Decoding + Block-Aware Scraper + VidSrc Fixed.
+ * CINE-MOVIE UNIFIED WORKER v1.3.6 (ULTIMATE Master)
+ * Corrected Data Root Hierarchy + Safe-Link Decoding + VidSrc Fixed.
  */
 
 export default {
@@ -47,7 +47,7 @@ export default {
             if (path === '/episode/servers') return handleServers(url.searchParams.get('animeEpisodeId'), respond);
             if (path === '/episode/sources') return handleSources(url, request, respond);
 
-            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.5' });
+            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.6' });
             return respond({ error: 'Route Not Found', path }, 404);
         } catch (e) {
             return respond({ error: 'Worker Interior Error', message: e.message, data: {} }, 200);
@@ -150,10 +150,22 @@ async function handleSearch(url, respond) {
     return respond({ data: { animes } });
 }
 
+function mapToCommon(h) {
+    return {
+        id: cleanId(h.match(/href="\/(.+?)"/)?.[1]),
+        name: cleanText(h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1]) || cleanText(h.match(/class="film-name"[\s\S]*?>(.+?)<\/a>/)?.[1]),
+        poster: h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1]
+    };
+}
+
 async function handleInfo(id, respond) {
-    const html = await fetchSafe(`/${id}`);
-    const mock = { info: { id, name: id, poster: '', description: '', stats: { rating: 'PG-13', quality: 'HD', episodes: { sub: 0, dub: 0 } }, charactersVoiceActors: [], recommendedAnimes: [] }, moreInfo: { genres: [], status: 'Released' } };
-    if (!html) return respond({ data: { anime: mock } });
+    const target = id.includes('/') ? `/${id}` : `/${id}`;
+    const html = await fetchSafe(target);
+    const mockInfo = { id, name: id, poster: '', description: '', stats: { rating: 'PG-13', quality: 'HD', episodes: { sub: 0, dub: 0 } }, charactersVoiceActors: [] };
+    const mockMore = { genres: [], status: 'Released', aired: 'N/A' };
+    
+    if (!html) return respond({ data: { anime: { info: mockInfo, moreInfo: mockMore }, seasons: [], relatedAnimes: [], recommendedAnimes: [] } });
+
     try {
         const name = cleanText(html.match(/<h2 class="film-name dynamic-name".*?>(.*?)<\/h2>/)?.[1]) || id;
         const poster = html.match(/<img class="film-poster-img" src="(.*?)"/)?.[1] || '';
@@ -161,10 +173,29 @@ async function handleInfo(id, respond) {
         const stats = {
             rating: cleanText(html.match(/class="tick-item tick-pg">(.+?)<\/div>/)?.[1]) || 'PG-13',
             quality: cleanText(html.match(/class="tick-item tick-quality">(.+?)<\/div>/)?.[1]) || 'HD',
-            episodes: { sub: cleanText(html.match(/class="tick-item tick-sub">[\s\S]*?<\/i>(.+?)<\/div>/)?.[1]) || 0 }
+            episodes: { 
+                sub: cleanText(html.match(/class="tick-item tick-sub">[\s\S]*?<\/i>(.+?)<\/div>/)?.[1]) || 0,
+                dub: cleanText(html.match(/class="tick-item tick-dub">[\s\S]*?<\/i>(.+?)<\/div>/)?.[1]) || 0
+            }
         };
-        return respond({ data: { anime: { info: { id, name, poster, description, stats, charactersVoiceActors: [], recommendedAnimes: [] }, moreInfo: mock.moreInfo } } });
-    } catch (e) { return respond({ data: { anime: mock } }); }
+        
+        const genreHtml = html.match(/<div class="item item-title">[\s\S]*?Genres:[\s\S]*?<\/div>([\s\S]*?)<\/div>/)?.[1] || '';
+        const genres = [...genreHtml.matchAll(/<a[^>]*>(.+?)<\/a>/g)].map(m => m[1]);
+        
+        const recs = [...html.matchAll(/<div class="flw-item">([\s\S]*?)<div class="film-detail">/g)].map(m => mapToCommon(m[1])).filter(x => x.id);
+
+        return respond({ 
+            data: { 
+                anime: { 
+                    info: { id, name, poster, description, stats, charactersVoiceActors: [], anilistId: 0 }, 
+                    moreInfo: { ...mockMore, genres, status: cleanText(html.match(/Status:<\/span>\s*<span>(.+?)<\/span>/)?.[1]) || 'Released' } 
+                },
+                seasons: [],
+                relatedAnimes: [],
+                recommendedAnimes: recs
+            } 
+        });
+    } catch (e) { return respond({ data: { anime: { info: mockInfo, moreInfo: mockMore }, seasons: [], relatedAnimes: [], recommendedAnimes: [] } }); }
 }
 
 async function handleEpisodes(id, respond) {

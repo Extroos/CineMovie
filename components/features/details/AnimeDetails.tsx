@@ -36,7 +36,11 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
   const animeId = anime.id.toString();
   const { data: details, isLoading: detailsLoading, error: detailsError } = useGetAnimeDetails(animeId);
   const { data: episodesData, isLoading: episodesLoading, error: episodesError } = useGetAllEpisodes(animeId);
-  const { data: banner, isLoading: bannerLoading } = useGetAnimeBanner(details?.anime.info.anilistId!);
+  
+  // details is from AnimeService.getDetails which returns a flattened object
+  const detailsData = details as any;
+
+  const { data: banner, isLoading: bannerLoading } = useGetAnimeBanner(detailsData?.anilistId!);
   
   const { data: serversData, isLoading: serversLoading } = useGetEpisodeServers(selectedEpisodeId!);
   const { data: episodeData, isLoading: episodeDataLoading, error: episodeDataError } = useGetEpisodeData(
@@ -63,14 +67,13 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
     onClose();
   };
 
-  const { anime: info, seasons, relatedAnimes, recommendedAnimes } = details || { seasons: [], relatedAnimes: [], recommendedAnimes: [] };
-  const bannerImage = (banner?.Media.bannerImage as string) || info?.info?.poster || anime.image;
-
   const animeInfo = useMemo(() => ({
-    title: info?.info?.name || anime.name || anime.title,
-    image: info?.info?.poster || anime.image || anime.poster,
+    title: detailsData?.title?.romaji || anime?.name || anime?.title || 'Unknown Anime',
+    image: detailsData?.coverImage?.extraLarge || anime?.image || anime?.poster,
     id: animeId
-  }), [info?.info?.name, info?.info?.poster, animeId, anime.name, anime.title, anime.image, anime.poster]);
+  }), [detailsData?.title?.romaji, detailsData?.coverImage?.extraLarge, animeId, anime.name, anime.title, anime.image, anime.poster]);
+
+  const bannerImage = (banner?.Media.bannerImage as string) || detailsData?.bannerImage || anime.image || anime.poster;
 
   if (detailsError) {
     return (
@@ -177,7 +180,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                 <img
                   src={bannerImage}
-                  alt={info?.info?.name || 'Anime Banner'}
+                  alt={detailsData?.title?.romaji || 'Anime Banner'}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -218,7 +221,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                 textShadow: '0 4px 12px rgba(0,0,0,0.6)',
                 letterSpacing: '-0.02em',
               }} className="italic uppercase">
-                {info?.info?.name || anime?.name || anime?.title || 'Unknown Anime'}
+                {detailsData?.title?.romaji || anime?.name || anime?.title || 'Unknown Anime'}
               </h1>
 
               {/* Metadata */}
@@ -233,22 +236,16 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                 color: '#e5e5e5',
               }}>
                   <span style={{ color: '#46d369' }}>
-                    {info?.info?.stats?.rating || '0'} Match
+                    {detailsData?.rating || '0'}% Match
                   </span>
-                  <span>{info?.moreInfo?.aired?.split(',')[1]?.trim() || info?.moreInfo?.aired || 'N/A'}</span>
+                  <span>{detailsData?.seasonYear || 'N/A'}</span>
                   <span style={{ opacity: 0.5 }}>|</span>
-                  <span>{info?.info?.stats?.quality || 'HD'}</span>
+                  <span>{detailsData?.quality || 'HD'}</span>
                   <span style={{ opacity: 0.5 }}>|</span>
                   <div className="flex items-center gap-1">
                      <Subtitles className="w-3.5 h-3.5" />
-                     <span>{info?.info?.stats?.episodes?.sub || 0}</span>
+                     <span>{detailsData?.episodes || 0}</span>
                   </div>
-                  {(info?.info?.stats?.episodes?.dub || 0) > 0 && (
-                     <div className="flex items-center gap-1">
-                         <Mic className="w-3.5 h-3.5" />
-                         <span>{info?.info?.stats?.episodes?.dub || 0}</span>
-                     </div>
-                  )}
               </div>
 
               {/* Action Buttons */}
@@ -342,12 +339,12 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                             color: 'rgba(255,255,255,0.8)', 
                             fontWeight: 500
                           }}>
-                            {info?.info?.description || anime?.description || 'No description available.'}
+                            {detailsData?.description || anime?.description || 'No description available.'}
                          </p>
                     </div>
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                       {info.moreInfo.genres?.map((g, i) => (
+                       {detailsData?.genres?.map((g: string, i: number) => (
                           <span key={i} style={{
                             fontSize: '0.85rem',
                             fontWeight: 700,
@@ -364,20 +361,16 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', opacity: 0.8 }}>
                         <div>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Studios</span>
-                            <p style={{ color: '#fff', fontWeight: 600 }}>{info?.moreInfo?.studios || 'N/A'}</p>
-                        </div>
-                        <div>
                             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Status</span>
-                            <p style={{ color: '#fff', fontWeight: 600 }}>{info?.moreInfo?.status || 'N/A'}</p>
+                            <p style={{ color: '#fff', fontWeight: 600 }}>{detailsData?.status || 'Released'}</p>
                         </div>
                     </div>
                  </div>
 
                  {/* Right Column: Characters & More */}
                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-                    {/* Character Section */}
-                    {(info?.info?.charactersVoiceActors?.length || 0) > 0 && (
+                     {/* Character Section */}
+                    {(detailsData?.charactersVoiceActors?.length || 0) > 0 && (
                       <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>Characters</h3>
                         <div style={{
@@ -388,7 +381,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                             scrollSnapType: 'x mandatory',
                             WebkitOverflowScrolling: 'touch',
                           }} className="no-scrollbar">
-                            {info?.info?.charactersVoiceActors?.slice(0, 15).map((char, idx) => (
+                            {detailsData?.charactersVoiceActors?.slice(0, 15).map((char: any, idx: number) => (
                                <div 
                                   key={idx} 
                                   style={{ 
@@ -427,7 +420,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                     )}
 
                     {/* More Like This */}
-                    {(recommendedAnimes?.length || 0) > 0 && (
+                    {(detailsData?.recommendations?.length || 0) > 0 && (
                       <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>Recommendations</h3>
                         <div style={{
@@ -435,7 +428,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                           gridTemplateColumns: 'repeat(3, 1fr)',
                           gap: '12px',
                         }}>
-                           {recommendedAnimes?.slice(0, 6).map((ani, idx) => (
+                           {detailsData?.recommendations?.slice(0, 6).map((ani: any, idx: number) => (
                              <div 
                                key={idx}
                                onClick={() => {

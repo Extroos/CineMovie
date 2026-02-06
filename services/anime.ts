@@ -55,6 +55,8 @@ export interface Anime {
   mediaType?: 'anime'; 
   name?: string; 
   recommendations?: Anime[];
+  charactersVoiceActors?: any[];
+  charactersVoiceActors?: any[];
 }
 
 export interface AnimeStreamConfig {
@@ -161,7 +163,7 @@ export const AnimeService = {
             title: {
                 romaji: info.name,
                 english: info.name,
-                native: info.name, // Aniwatch often gives one name
+                native: info.name,
                 userPreferred: info.name
             },
             coverImage: {
@@ -173,15 +175,16 @@ export const AnimeService = {
             bannerImage: info.poster, 
             description: info.description,
             genres: more?.genres || [],
-            season: more?.season, // e.g. "Spring 2024"
+            season: more?.season,
             seasonYear: more?.aired ? parseInt(more.aired.split(',')[1]) : undefined,
             episodes: info.stats?.episodes?.sub || 0,
             status: more?.status,
             rating: info.stats?.rating ? (parseFloat(info.stats.rating) * 10) : 0, 
             popularity: 0, 
-            episodesList: episodesList,
+            episodesList: episodesList || [],
             mediaType: 'anime',
-            recommendations: (info.recommendedAnimes || info.relatedAnimes || []).map(mapAniwatchAnime)
+            charactersVoiceActors: info.charactersVoiceActors || [],
+            recommendations: (data.recommendedAnimes || info.recommendedAnimes || info.relatedAnimes || []).map(mapAniwatchAnime).filter(Boolean)
         };
     } catch (e) {
         console.error('AnimeService.getDetails error:', e);
