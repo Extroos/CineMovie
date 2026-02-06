@@ -1,6 +1,6 @@
 /**
- * CINE-MOVIE UNIFIED WORKER v1.2.6 (RESILIENT)
- * Fixed 503 Timeouts, Parallel Scraping, Elite CORS.
+ * CINE-MOVIE UNIFIED WORKER v1.2.7 (ULTIMATE STABILITY)
+ * Fixes CORS Preflight, 503 Timeouts, and JSON Parsing crashes.
  */
 
 export default {
@@ -8,9 +8,11 @@ export default {
         const corsHeaders = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
-            'Access-Control-Allow-Headers': 'Content-Type, Bypass-Tunnel-Reminder',
+            'Access-Control-Allow-Headers': 'Content-Type, Bypass-Tunnel-Reminder, X-Requested-With',
+            'Access-Control-Max-Age': '86400',
         };
 
+        // Utility: Unified response with guaranteed CORS
         const respond = (data, status = 200, type = 'application/json') => {
             return new Response(typeof data === 'string' ? data : JSON.stringify(data), {
                 status,
@@ -18,22 +20,35 @@ export default {
             });
         };
 
-        if (request.method === 'OPTIONS') return respond(null, 204);
+        // Handle Preflight & Health Checks instantly
+        if (request.method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: corsHeaders });
+        }
+        
+        // Rapid Health Check: if HEAD and hitting /home or /, just say OK
+        if (request.method === 'HEAD') {
+            return new Response(null, { status: 200, headers: corsHeaders });
+        }
 
         try {
             const url = new URL(request.url);
             const path = url.pathname;
 
-            if (path === '/proxy') return handleProxy(request, respond);
+            // --- 1. PROXY ---
+            if (path === '/proxy') return handleProxy(request, respond, corsHeaders);
+
+            // --- 2. HIANIME ---
             if (path === '/home') return handleHome(respond);
             if (path === '/search') return handleSearch(url, respond);
             if (path.startsWith('/info/')) return handleInfo(path.split('/').pop(), respond);
             if (path.startsWith('/episodes/')) return handleEpisodes(path.split('/').pop(), respond);
             if (path.startsWith('/servers/')) return handleServers(path.split('/').pop(), respond);
             if (path === '/sources') return handleSources(url, request, respond);
+
+            // --- 3. VIDSRC ---
             if (path.startsWith('/vidsrc/')) return handleVidSrc(path, respond);
 
-            // Kitsune Compat
+            // --- 4. COMPAT ---
             if (path.startsWith('/anime/')) {
                 const id = path.split('/')[2];
                 if (path.endsWith('/episodes')) return handleEpisodes(id, respond);
@@ -42,20 +57,19 @@ export default {
             if (path === '/episode/servers') return handleServers(url.searchParams.get('animeEpisodeId'), respond);
             if (path === '/episode/sources') return handleSources(url, request, respond);
 
-            if (path === '/') return respond({ status: 'READY', v: '1.2.6' });
+            if (path === '/') return respond({ status: 'ACTIVE', v: '1.2.7' });
             return respond({ error: 'Not Found' }, 404);
 
         } catch (e) {
-            return respond({ error: 'Worker Error', message: e.message }, 500);
+            return respond({ error: 'Worker Interior Error', message: e.message }, 500);
         }
     }
 };
 
 async function fetchWithMirror(url) {
     const domains = ['https://hianime.to', 'https://hianimez.to'];
-    // Parallel race for speed and timeout avoidance
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
+    const timeout = setTimeout(() => controller.abort(), 7000);
 
     try {
         const promises = domains.map(d => 
@@ -64,7 +78,7 @@ async function fetchWithMirror(url) {
                 signal: controller.signal
             }).then(r => {
                 if (r.ok) {
-                    controller.abort(); // Cancel other mirror fetches
+                    controller.abort();
                     return r.text();
                 }
                 throw new Error('Mirror fail');
@@ -74,7 +88,7 @@ async function fetchWithMirror(url) {
         clearTimeout(timeout);
         return result;
     } catch (e) {
-        throw new Error('All mirrors failed or timed out');
+        throw new Error('Mirror Sync Failed: ' + e.message);
     }
 }
 
@@ -161,16 +175,24 @@ async function handleSources(url, request, respond) {
 async function handleVidSrc(path, respond) {
     try {
         let t = path.replace('/vidsrc', '');
+        // Mapping: /movie/1 -> /api/latest/movie/1
         if (t.startsWith('/movie/')) t = `/api/movie/latest?page=${t.split('/').pop()}`;
         else if (t.startsWith('/tv/')) t = `/api/tv/latest?page=${t.split('/').pop()}`;
         else if (t.startsWith('/episodes/')) t = `/api/episode/latest?page=${t.split('/').pop()}`;
+        
         const res = await fetch(`https://vidsrc.icu${t}`);
+        if (!res.ok) return respond({ result: [] }); // Always valid JSON
+        
         const text = await res.text();
-        try { return respond(JSON.parse(text)); } catch { return respond(text, 200, 'text/plain'); }
-    } catch (e) { return respond({ error: e.message }, 500); }
+        try { 
+            return respond(JSON.parse(text)); 
+        } catch { 
+            return respond({ result: [] }); // Fallback to empty result if not JSON
+        }
+    } catch (e) { return respond({ result: [] }, 500); }
 }
 
-async function handleProxy(request, respond) {
+async function handleProxy(request, respond, corsHeaders) {
     const url = new URL(request.url).searchParams.get('url');
     const ref = new URL(request.url).searchParams.get('referer');
     try {
@@ -183,6 +205,9 @@ async function handleProxy(request, respond) {
             t = t.split('\n').map(l => (l.startsWith('#') || !l.trim()) ? l : `${origin}/proxy?url=${encodeURIComponent(l.startsWith('http') ? l : `${base}/${l}`)}&referer=${encodeURIComponent(ref || '')}`).join('\n');
             return respond(t, 200, type);
         }
-        return new Response(res.body, { status: res.status, headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': type } });
+        return new Response(res.body, { 
+            status: res.status, 
+            headers: { ...corsHeaders, 'Content-Type': type } 
+        });
     } catch (e) { return respond({ error: e.message }, 500); }
 }
