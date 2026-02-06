@@ -1,6 +1,6 @@
 /**
- * CINE-MOVIE UNIFIED WORKER v1.3.1 (MASTER STABILITY)
- * Block-Based Scraper + Schedule + VidSrc Fixed.
+ * CINE-MOVIE UNIFIED WORKER v1.3.2 (ULTRA-MASTER)
+ * Block-Aware Scraper + Schedule + VidSrc Fixed + Redirects Safe.
  */
 
 export default {
@@ -27,7 +27,6 @@ export default {
             const url = new URL(request.url);
             const path = url.pathname;
 
-            // API Routes
             if (path === '/proxy') return handleProxy(request, respond, corsHeaders);
             if (path === '/home') return handleHome(respond);
             if (path === '/search') return handleSearch(url, respond);
@@ -38,7 +37,7 @@ export default {
             if (path === '/sources') return handleSources(url, request, respond);
             if (path.startsWith('/vidsrc/')) return handleVidSrc(path, respond);
 
-            // Kitsune Compat
+            // Kitsune/Mobile Compat
             if (path.startsWith('/anime/')) {
                 const id = path.split('/')[2];
                 if (path.endsWith('/episodes')) return handleEpisodes(id, respond);
@@ -47,14 +46,8 @@ export default {
             if (path === '/episode/servers') return handleServers(url.searchParams.get('animeEpisodeId'), respond);
             if (path === '/episode/sources') return handleSources(url, request, respond);
 
-            // Health check or fallback
-            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.1' });
-            
-            // If we are reaching this via a frontend route like /watch or /settings, 
-            // and this worker is also the frontend domain, we should return a 404 
-            // but for safety let's return error JSON. 
-            // BUT if the user is using Cloudflare Pages, this worker is just the proxy.
-            return respond({ error: 'Route Not Found', path }, 404);
+            if (path === '/') return respond({ status: 'ACTIVE', v: '1.3.2' });
+            return respond({ error: 'Route Not Found' }, 404);
         } catch (e) {
             return respond({ error: 'Worker Interior Error', message: e.message, data: {} }, 200);
         }
@@ -78,35 +71,38 @@ async function fetchSafe(url) {
     return null;
 }
 
+function cleanText(t) { return t?.replace(/<[^>]*>/g, '').trim(); }
+
 async function handleHome(respond) {
     const html = await fetchSafe('/home');
     if (!html) return respond({ data: { spotlightAnimes: [], trendingAnimes: [], latestEpisodeAnimes: [], topUpcomingAnimes: [] } });
 
     // 1. Spotlight (Big Slider)
-    const spotlights = [...html.matchAll(/<div class="swiper-slide spotlight-item">([\s\S]*?)<\/div>\s*<\/div>/g)].map(item => {
+    const spotlights = [...html.matchAll(/<div class="deslide-item">([\s\S]*?)<div class="desi-buttons">/g)].map(item => {
         const h = item[1];
-        const slug = h.match(/href="\/(.+?)"/)?.[1];
-        const name = h.match(/class="desi-head-title dynamic-name"[\s\S]*?>(.+?)<\/div>/)?.[1];
-        const poster = h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1];
-        return { id: slug, name: name?.trim(), poster };
+        return {
+            id: h.match(/href="\/(.+?)"/)?.[1],
+            name: cleanText(h.match(/class="desi-head-title dynamic-name"[\s\S]*?>(.+?)<\/div>/)?.[1]),
+            poster: h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1]
+        };
     }).filter(x => x.id && x.name);
 
     // 2. Trending
-    const trendings = [...html.matchAll(/<div class="swiper-slide item-qtip"[\s\S]*?>([\s\S]*?)<\/div>\s*<\/div>/g)].map(item => {
+    const trendings = [...html.matchAll(/<div class="swiper-slide item-qtip"[\s\S]*?>([\s\S]*?)<div class="clearfix"><\/div>/g)].map(item => {
         const h = item[1];
-        const slug = h.match(/href="\/(.+?)"/)?.[1];
-        const name = h.match(/class="film-title dynamic-name"[\s\S]*?>(.+?)<\/div>/)?.[1];
+        const id = h.match(/href="\/(.+?)"/)?.[1];
+        const name = cleanText(h.match(/class="film-title dynamic-name"[\s\S]*?>(.+?)<\/div>/)?.[1]);
         const poster = h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1];
-        return { id: slug, name: name?.trim(), poster };
+        return { id, name, poster };
     }).filter(x => x.id && x.name);
 
-    // 3. Grid Items (Latest, Popular, etc.)
-    const gridItems = [...html.matchAll(/<div class="flw-item">([\s\S]*?)<\/div>\s*<\/div>/g)].map(item => {
-        const h = item[1];
-        const slug = h.match(/href="\/(.+?)"/)?.[1];
-        const name = h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1];
+    // 3. Grids (Latest, Airing, etc.)
+    const gridItems = [...html.matchAll(/<(?:div class="flw-item"|li)>([\s\S]*?)<div class="film-detail">([\s\S]*?)<\/div>/g)].map(item => {
+        const h = item[0];
+        const id = h.match(/href="\/(.+?)"/)?.[1];
+        const name = cleanText(h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1]);
         const poster = h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1];
-        return { id: slug, name: name?.trim(), poster };
+        return { id, name, poster };
     }).filter(x => x.id && x.name);
 
     return respond({ 
@@ -114,6 +110,7 @@ async function handleHome(respond) {
             spotlightAnimes: spotlights,
             trendingAnimes: trendings.slice(0, 10),
             latestEpisodeAnimes: gridItems.slice(0, 12),
+            mostPopularAnimes: gridItems.slice(12, 24),
             topUpcomingAnimes: []
         }
     });
@@ -126,9 +123,9 @@ async function handleSchedule(url, respond) {
     const items = [...html.matchAll(/<li class="item">([\s\S]*?)<\/li>/g)].map(item => {
         const h = item[1];
         return {
-            time: h.match(/class="time">(.+?)<\/div>/)?.[1]?.trim(),
+            time: cleanText(h.match(/class="time">(.+?)<\/div>/)?.[1]),
             id: h.match(/href="\/(.+?)"/)?.[1],
-            name: h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1]?.trim()
+            name: cleanText(h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1])
         };
     }).filter(x => x.id);
     return respond({ data: items });
@@ -138,11 +135,11 @@ async function handleSearch(url, respond) {
     const q = url.searchParams.get('q') || '';
     const html = await fetchSafe(`/search?keyword=${encodeURIComponent(q)}`);
     if (!html) return respond({ data: { animes: [] } });
-    const animes = [...html.matchAll(/<div class="flw-item">([\s\S]*?)<\/div>\s*<\/div>/g)].map(item => {
-        const h = item[1];
+    const animes = [...html.matchAll(/<div class="flw-item">([\s\S]*?)<div class="film-detail">([\s\S]*?)<\/div>/g)].map(item => {
+        const h = item[0];
         return {
             id: h.match(/href="\/(.+?)"/)?.[1],
-            name: h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1]?.trim(),
+            name: cleanText(h.match(/class="dynamic-name"[\s\S]*?>(.+?)<\/a>/)?.[1]),
             poster: h.match(/data-src="(.+?)"/)?.[1] || h.match(/src="(.+?)"/)?.[1]
         };
     }).filter(x => x.id);
@@ -154,10 +151,15 @@ async function handleInfo(id, respond) {
     const mock = { info: { id, name: id, poster: '', description: '', stats: { rating: 'PG-13', quality: 'HD', episodes: { sub: 0, dub: 0 } }, charactersVoiceActors: [], recommendedAnimes: [] }, moreInfo: { genres: [], status: 'Released' } };
     if (!html) return respond({ data: { anime: mock } });
     try {
-        const name = html.match(/<h2 class="film-name dynamic-name".*?>(.*?)<\/h2>/)?.[1] || id;
+        const name = cleanText(html.match(/<h2 class="film-name dynamic-name".*?>(.*?)<\/h2>/)?.[1]) || id;
         const poster = html.match(/<img class="film-poster-img" src="(.*?)"/)?.[1] || '';
-        const description = html.match(/<div class="text">(.*?)<\/div>/)?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-        return respond({ data: { anime: { info: { id, name, poster, description, stats: mock.info.stats, charactersVoiceActors: [], recommendedAnimes: [] }, moreInfo: mock.moreInfo } } });
+        const description = cleanText(html.match(/<div class="text">(.*?)<\/div>/)?.[1]);
+        const stats = {
+            rating: cleanText(html.match(/class="tick-item tick-pg">(.+?)<\/div>/)?.[1]) || 'PG-13',
+            quality: cleanText(html.match(/class="tick-item tick-quality">(.+?)<\/div>/)?.[1]) || 'HD',
+            episodes: { sub: cleanText(html.match(/class="tick-item tick-sub">[\s\S]*?<\/i>(.+?)<\/div>/)?.[1]) || 0 }
+        };
+        return respond({ data: { anime: { info: { id, name, poster, description, stats, charactersVoiceActors: [], recommendedAnimes: [] }, moreInfo: mock.moreInfo } } });
     } catch (e) { return respond({ data: { anime: mock } }); }
 }
 
