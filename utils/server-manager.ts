@@ -64,8 +64,9 @@ export const ServerManager = {
              }
         }
 
-        // 2. Default Local/Proxy (SKIP ON NATIVE)
-        if (!isNative) {
+        // 2. Default Local/Proxy (SKIP ON NATIVE & CLOUDFLARE WORKERS)
+        const isCloudflare = !isNative && window.location.hostname.includes('workers.dev');
+        if (!isNative && !isCloudflare) {
             try {
                 const res = await fetch('/hianime/home', { 
                     method: 'HEAD',
