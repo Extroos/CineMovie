@@ -1,6 +1,6 @@
 /**
- * CINE-MOVIE UNIFIED WORKER v1.2.9 (ULTIMATE RELIABILITY)
- * Fixes JSON Syntax Errors and sequential timeout failures.
+ * CINE-MOVIE UNIFIED WORKER v1.3.0 (MASTER STABILITY)
+ * Elite Scraper + Schedule + VidSrc Fixed.
  */
 
 export default {
@@ -13,7 +13,6 @@ export default {
         };
 
         const respond = (data, status = 200, type = 'application/json') => {
-            // CRITICAL: Ensure JSON is ALWAYS stringified if header is JSON
             const body = type === 'application/json' ? JSON.stringify(data) : data;
             return new Response(body, {
                 status,
@@ -31,6 +30,7 @@ export default {
             if (path === '/proxy') return handleProxy(request, respond, corsHeaders);
             if (path === '/home') return handleHome(respond);
             if (path === '/search') return handleSearch(url, respond);
+            if (path === '/schedule') return handleSchedule(url, respond);
             if (path.startsWith('/info/')) return handleInfo(path.split('/').pop(), respond);
             if (path.startsWith('/episodes/')) return handleEpisodes(path.split('/').pop(), respond);
             if (path.startsWith('/servers/')) return handleServers(path.split('/').pop(), respond);
@@ -46,21 +46,20 @@ export default {
             if (path === '/episode/servers') return handleServers(url.searchParams.get('animeEpisodeId'), respond);
             if (path === '/episode/sources') return handleSources(url, request, respond);
 
-            if (path === '/') return respond({ status: 'READY', v: '1.2.9' });
+            if (path === '/') return respond({ status: 'READY', v: '1.3.0' });
             return respond({ error: 'Not Found' }, 404);
         } catch (e) {
-            // Aggressive fallback to 200 OK + JSON body to keep UI alive
-            return respond({ error: 'Worker Failure', message: e.message, data: {} }, 200);
+            return respond({ error: 'Worker Error', message: e.message, data: {} }, 200);
         }
     }
 };
 
 async function fetchSafe(url) {
-    const domains = ['https://hianimez.to', 'https://hianime.to'];
+    const domains = ['https://hianime.to', 'https://hianimez.to'];
     for (const d of domains) {
         try {
             const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), 4500);
+            const timer = setTimeout(() => controller.abort(), 5000);
             const res = await fetch(`${d}${url}`, {
                 headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'X-Requested-With': 'XMLHttpRequest' },
                 signal: controller.signal
@@ -74,20 +73,51 @@ async function fetchSafe(url) {
 
 async function handleHome(respond) {
     const html = await fetchSafe('/home');
-    const extract = r => !html ? [] : [...html.matchAll(r)].map(m => ({ id: m[2], poster: m[1], name: m[3] }));
+    if (!html) return respond({ data: { spotlightAnimes: [], trendingAnimes: [], latestEpisodeAnimes: [], topUpcomingAnimes: [] } });
+
+    const extractSpotlight = () => {
+        const matches = [...html.matchAll(/<div class="swiper-slide spotlight-item">[\s\S]*?data-src="(.+?)"[\s\S]*?class="desi-head-title dynamic-name"[\s\S]*?>(.+?)<\/div>[\s\S]*?href="\/(.+?)" class="btn btn-secondary/g)];
+        return matches.map(m => ({ id: m[3], poster: m[1], name: m[2].trim() }));
+    };
+
+    const extractTrending = () => {
+        const matches = [...html.matchAll(/<div class="swiper-slide item-qtip" data-id="(.+?)">[\s\S]*?data-jname="(.+?)">(.+?)<\/div>[\s\S]*?href="\/(.+?)" class="film-poster">[\s\S]*?data-src="(.+?)"/g)];
+        return matches.map(m => ({ id: m[4], poster: m[5], name: m[3].trim() }));
+    };
+
+    const extractLatest = () => {
+        const matches = [...html.matchAll(/<div class="flw-item">[\s\S]*?href="\/(.+?)"[\s\S]*?data-src="(.+?)"[\s\S]*?class="dynamic-name"[\s\S]*?>(.+?)<\/a>/g)];
+        return matches.map(m => ({ id: m[1], poster: m[2], name: m[3].trim() }));
+    };
+
     return respond({ 
         data: { 
-            spotlightAnimes: extract(/<div class="swiper-slide spotlight-item">[\s\S]*?src="(.+?)"[\s\S]*?class="des-title">[\s\S]*?href="\/(.+?)"[\s\S]*?>(.+?)<\/a>/g),
-            trendingAnimes: extract(/<div class="item">[\s\S]*?src="(.+?)"[\s\S]*?class="film-poster-ahref" href="\/(.+?)" title="(.+?)"/g).slice(0, 10),
-            latestEpisodeAnimes: extract(/<div class="flw-item">[\s\S]*?href="\/(.+?)"[\s\S]*?src="(.+?)"[\s\S]*?class="dynamic-name"[\s\S]*?>(.+?)<\/a>/g).slice(0, 12),
+            spotlightAnimes: extractSpotlight(),
+            trendingAnimes: extractTrending().slice(0, 10),
+            latestEpisodeAnimes: extractLatest().slice(0, 12),
             topUpcomingAnimes: []
         }
     });
 }
 
+async function handleSchedule(url, respond) {
+    const rawDate = url.searchParams.get('date') || new Date().toISOString().split('T')[0];
+    const html = await fetchSafe(`/schedule?date=${rawDate}`);
+    if (!html) return respond({ data: [] });
+
+    // Extract schedule items
+    const matches = [...html.matchAll(/<li class="item">[\s\S]*?time">(.+?)<\/div>[\s\S]*?href="\/(.+?)"[\s\S]*?dynamic-name"[\s\S]*?>(.+?)<\/a>/g)];
+    const data = matches.map(m => ({ time: m[1].trim(), id: m[2], name: m[3].trim() }));
+    
+    return respond({ data });
+}
+
 async function handleSearch(url, respond) {
-    const html = await fetchSafe(`/search?keyword=${encodeURIComponent(url.searchParams.get('q') || '')}`);
-    const animes = !html ? [] : [...html.matchAll(/<div class="flw-item">[\s\S]*?href="\/(.+?)"[\s\S]*?src="(.+?)"[\s\S]*?class="dynamic-name"[\s\S]*?>(.+?)<\/a>/g)].map(m => ({ id: m[1], poster: m[2], name: m[3] }));
+    const q = url.searchParams.get('q') || '';
+    const html = await fetchSafe(`/search?keyword=${encodeURIComponent(q)}`);
+    if (!html) return respond({ data: { animes: [] } });
+
+    const animes = [...html.matchAll(/<div class="flw-item">[\s\S]*?href="\/(.+?)"[\s\S]*?data-src="(.+?)"[\s\S]*?class="dynamic-name"[\s\S]*?>(.+?)<\/a>/g)].map(m => ({ id: m[1], poster: m[2], name: m[3].trim() }));
     return respond({ data: { animes } });
 }
 
@@ -97,21 +127,25 @@ async function handleInfo(id, respond) {
     if (!html) return respond({ data: { anime: mock } });
 
     try {
-        const info = {
-            id,
-            name: html.match(/<h2 class="film-name dynamic-name".*?>(.*?)<\/h2>/)?.[1] || id,
-            poster: html.match(/<img class="film-poster-img" src="(.*?)"/)?.[1] || '',
-            description: html.match(/<div class="text">(.*?)<\/div>/)?.[1]?.replace(/<[^>]*>/g, '').trim() || '',
-            stats: { rating: 'PG-13', quality: 'HD', episodes: { sub: 0, dub: 0 } },
-            charactersVoiceActors: [], recommendedAnimes: []
-        };
-        return respond({ data: { anime: { info, moreInfo: mock.moreInfo } } });
+        const name = html.match(/<h2 class="film-name dynamic-name".*?>(.*?)<\/h2>/)?.[1] || id;
+        const poster = html.match(/<img class="film-poster-img" src="(.*?)"/)?.[1] || '';
+        const description = html.match(/<div class="text">(.*?)<\/div>/)?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        
+        return respond({ 
+            data: { 
+                anime: { 
+                    info: { id, name, poster, description, stats: { rating: 'PG-13', quality: 'HD', episodes: { sub: 0, dub: 0 } }, charactersVoiceActors: [], recommendedAnimes: [] },
+                    moreInfo: mock.moreInfo
+                }
+            }
+        });
     } catch (e) { return respond({ data: { anime: mock } }); }
 }
 
 async function handleEpisodes(id, respond) {
     try {
-        const res = await fetch(`https://hianime.to/ajax/v2/episode/list/${id.split('-').pop()}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const cleanId = id.split('-').pop();
+        const res = await fetch(`https://hianime.to/ajax/v2/episode/list/${cleanId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
         const json = await res.json();
         const episodes = [...(json.html || '').matchAll(/data-id="(.+?)"[\s\S]*?data-number="(.+?)"[\s\S]*?title="(.+?)"/g)].map(m => ({ episodeId: m[1], number: parseInt(m[2]), title: m[3] }));
         return respond({ data: { episodes } });
@@ -148,17 +182,17 @@ async function handleSources(url, request, respond) {
 async function handleVidSrc(path, respond) {
     try {
         let t = path.replace('/vidsrc', '');
+        // Standardize routes for VidSrc.icu
+        if (t === '/movie' || t === '/tv' || t === '/movie/' || t === '/tv/') {
+             t += 'latest';
+        }
         if (t.startsWith('/movie/')) t = `/api/movie/latest?page=${t.split('/').pop()}`;
         else if (t.startsWith('/tv/')) t = `/api/tv/latest?page=${t.split('/').pop()}`;
         else if (t.startsWith('/episodes/')) t = `/api/episode/latest?page=${t.split('/').pop()}`;
         
         const res = await fetch(`https://vidsrc.icu${t}`, { signal: AbortSignal.timeout(6000) });
         const text = await res.text();
-        try { 
-            return respond(JSON.parse(text)); 
-        } catch { 
-            return respond({ result: [] }); // Guaranteed JSON structure even on error
-        }
+        try { return respond(JSON.parse(text)); } catch { return respond({ result: [] }); }
     } catch (e) { return respond({ result: [] }); }
 }
 
