@@ -377,7 +377,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                  {/* Right Column: Characters & More */}
                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
                     {/* Character Section */}
-                    {info.info.charactersVoiceActors.length > 0 && (
+                    {(info?.info?.charactersVoiceActors?.length || 0) > 0 && (
                       <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>Characters</h3>
                         <div style={{
@@ -427,7 +427,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                     )}
 
                     {/* More Like This */}
-                    {(recommendedAnimes.length > 0) && (
+                    {(recommendedAnimes?.length || 0) > 0 && (
                       <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>Recommendations</h3>
                         <div style={{
@@ -435,7 +435,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                           gridTemplateColumns: 'repeat(3, 1fr)',
                           gap: '12px',
                         }}>
-                           {recommendedAnimes.slice(0, 6).map((ani, idx) => (
+                           {recommendedAnimes?.slice(0, 6).map((ani, idx) => (
                              <div 
                                key={idx}
                                onClick={() => {
@@ -512,7 +512,7 @@ export default function AnimeDetails({ anime, onClose }: AnimeDetailsProps) {
                             <p className="font-bold underline tracking-widest italic">INDEXING EPISODES...</p>
                         </div>
                     ) : (
-                        episodesData?.episodes.map((ep) => (
+                        episodesData?.episodes?.map((ep) => (
                             <div 
                                 key={ep.episodeId}
                                 onClick={() => handleEpisodeClick(ep.episodeId)}

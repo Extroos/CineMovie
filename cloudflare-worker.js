@@ -1,6 +1,6 @@
 /**
- * CINE-MOVIE UNIFIED WORKER v1.2.3 (STABLE)
- * All-in-one: Scraper + Proxy + Defense
+ * CINE-MOVIE UNIFIED WORKER v1.2.4 (STABLE)
+ * All-in-one: Scraper + Proxy + Defense + VidSrc Fix
  */
 
 export default {
@@ -25,6 +25,9 @@ export default {
     if (path.startsWith('/servers/')) return handleServers(path.split('/').pop(), corsHeaders);
     if (path === '/sources') return handleSources(url, corsHeaders, request);
 
+    // VIDSRC Integration
+    if (path.startsWith('/vidsrc/')) return handleVidSrc(path, corsHeaders);
+
     // KITSUNE BACKWARD COMPAT
     if (path.startsWith('/anime/')) {
         const id = path.split('/')[2];
@@ -34,7 +37,7 @@ export default {
     if (path === '/episode/servers') return handleServers(url.searchParams.get('animeEpisodeId'), corsHeaders);
     if (path === '/episode/sources') return handleSources(url, corsHeaders, request);
 
-    if (path === '/') return new Response(JSON.stringify({ status: 'READY', v: '1.2.3' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (path === '/') return new Response(JSON.stringify({ status: 'READY', v: '1.2.4' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     return new Response('404', { status: 404, headers: corsHeaders });
   }
 };
@@ -55,15 +58,6 @@ async function fetchHtml(url) {
 async function handleHome(headers) {
     try {
         const html = await fetchHtml('/home');
-        
-        const extractGrid = (containerId) => {
-            const items = [];
-            // Find the container block if possible, or just global search for flw-item
-            const matches = [...html.matchAll(/<div class="flw-item">[\s\S]*?href="\/(.+?)"[\s\S]*?src="(.+?)"[\s\S]*?class="dynamic-name"[\s\S]*?>(.+?)<\/a>/g)];
-            for (const m of matches) items.push({ id: m[1], poster: m[2], name: m[3] });
-            return items;
-        };
-
         const spotlight = [];
         const spotMatches = [...html.matchAll(/<div class="swiper-slide spotlight-item">[\s\S]*?src="(.+?)"[\s\S]*?class="des-title">[\s\S]*?href="\/(.+?)"[\s\S]*?>(.+?)<\/a>/g)];
         for (const m of spotMatches) spotlight.push({ id: m[2], poster: m[1], name: m[3] });
@@ -72,11 +66,15 @@ async function handleHome(headers) {
         const trendMatches = [...html.matchAll(/<div class="item">[\s\S]*?src="(.+?)"[\s\S]*?class="film-poster-ahref" href="\/(.+?)" title="(.+?)"/g)];
         for (const m of trendMatches) trending.push({ id: m[2], poster: m[1], name: m[3] });
 
+        const latest = [];
+        const latMatches = [...html.matchAll(/<div class="flw-item">[\s\S]*?href="\/(.+?)"[\s\S]*?src="(.+?)"[\s\S]*?class="dynamic-name"[\s\S]*?>(.+?)<\/a>/g)];
+        for (const m of latMatches) latest.push({ id: m[1], poster: m[2], name: m[3] });
+
         return new Response(JSON.stringify({ 
             data: { 
                 spotlightAnimes: spotlight, 
                 trendingAnimes: trending.slice(0, 10), 
-                latestEpisodeAnimes: extractGrid().slice(0, 12),
+                latestEpisodeAnimes: latest.slice(0, 12),
                 topUpcomingAnimes: [] 
             } 
         }), { headers: { ...headers, 'Content-Type': 'application/json' } });
@@ -166,7 +164,15 @@ async function handleSources(url, headers, request) {
 
 async function handleVidSrc(path, headers) {
     try {
-        const res = await fetch(`https://vidsrc.icu${path.replace('/vidsrc', '')}`);
+        // Path mapping for VidSrc.icu API
+        let targetPath = path.replace('/vidsrc', '');
+        
+        // Fix routes: /movie/1 -> /api/latest/movie/1
+        if (targetPath.startsWith('/movie/')) targetPath = `/api/movie/latest${targetPath.replace('/movie', '')}`;
+        if (targetPath.startsWith('/tv/')) targetPath = `/api/tv/latest${targetPath.replace('/tv', '')}`;
+        if (targetPath.startsWith('/episodes/')) targetPath = `/api/episode/latest${targetPath.replace('/episodes', '')}`;
+        
+        const res = await fetch(`https://vidsrc.icu${targetPath}`);
         const data = await res.json();
         return new Response(JSON.stringify(data), { headers: { ...headers, 'Content-Type': 'application/json' } });
     } catch (e) { return new Response(JSON.stringify({ error: e.message }), { status: 500, headers }); }
