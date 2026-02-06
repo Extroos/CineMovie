@@ -95,8 +95,19 @@ export const ServerManager = {
             console.warn('[ServerManager] Cloud fallback check failed:', e);
         }
         
-        const isVercel = !isNative && window.location.hostname.includes('vercel.app');
-        if (isVercel) return '/hianime';
+        const isCloudHost = !isNative && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('workers.dev'));
+        if (isCloudHost) {
+            // Priority: Verify if the /hianime proxy is actually alive (Vercel deployment)
+            try {
+                const res = await fetch('/hianime/home', { signal: AbortSignal.timeout(1500) });
+                if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+                    return '/hianime';
+                }
+            } catch (e) {}
+            
+            // If on workers.dev or proxy test failed, use absolute Vercel link
+            return FALLBACK_CLOUD;
+        }
         
         return FALLBACK_CLOUD;
     }

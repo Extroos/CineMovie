@@ -3,7 +3,15 @@
  * Provides access to streaming embed URLs and content lists
  */
 
-const BASE_URL = '/vidsrc'; // Proxy to https://vidsrc.icu
+import { ServerManager } from '../utils/server-manager';
+
+const getBaseUrl = async () => {
+    const serverUrl = await ServerManager.getUrl();
+    // If it's the /hianime proxy, we need the root for /vidsrc
+    if (serverUrl === '/hianime') return '/vidsrc';
+    // If it's an absolute URL, use it as prefix (Vercel will handle the /vidsrc rewrite)
+    return `${serverUrl.replace(/\/$/, '')}/vidsrc`;
+};
 
 export interface VidSrcItem {
   imdb_id?: string;
@@ -19,7 +27,8 @@ export const VidSrcService = {
   // Get latest movies
   async getLatestMovies(page: number = 1): Promise<VidSrcItem[]> {
     try {
-      const response = await fetch(`${BASE_URL}/movie/${page}`);
+      const baseUrl = await getBaseUrl();
+      const response = await fetch(`${baseUrl}/movie/${page}`);
       if (!response.ok) return [];
       const json = await response.json();
       return (json.result || []).map((item: any) => ({ ...item, type: 'movie' }));
@@ -32,7 +41,8 @@ export const VidSrcService = {
   // Get latest TV shows
   async getLatestTV(page: number = 1): Promise<VidSrcItem[]> {
     try {
-      const response = await fetch(`${BASE_URL}/tv/${page}`);
+      const baseUrl = await getBaseUrl();
+      const response = await fetch(`${baseUrl}/tv/${page}`);
       if (!response.ok) return [];
       const json = await response.json();
       return (json.result || []).map((item: any) => ({ ...item, type: 'tv' }));
@@ -45,7 +55,8 @@ export const VidSrcService = {
   // Get recent episodes
   async getRecentEpisodes(page: number = 1): Promise<any[]> {
     try {
-      const response = await fetch(`${BASE_URL}/episodes/${page}`);
+      const baseUrl = await getBaseUrl();
+      const response = await fetch(`${baseUrl}/episodes/${page}`);
       if (!response.ok) return [];
       const json = await response.json();
       return json.result || [];
@@ -56,12 +67,14 @@ export const VidSrcService = {
   },
 
   // Generate embed URL for Movie
-  getMovieEmbed: (tmdbId: number | string) => {
-    return `${BASE_URL}/embed/movie/${tmdbId}`;
+  getMovieEmbed: async (tmdbId: number | string) => {
+    const baseUrl = await getBaseUrl();
+    return `${baseUrl}/embed/movie/${tmdbId}`;
   },
 
   // Generate embed URL for TV Show
-  getTVEmbed: (tmdbId: number | string, season: number, episode: number) => {
-    return `${BASE_URL}/embed/tv/${tmdbId}/${season}/${episode}`;
+  getTVEmbed: async (tmdbId: number | string, season: number, episode: number) => {
+    const baseUrl = await getBaseUrl();
+    return `${baseUrl}/embed/tv/${tmdbId}/${season}/${episode}`;
   }
 };

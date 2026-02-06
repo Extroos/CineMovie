@@ -8,6 +8,9 @@ import os from 'os';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+app.use(cors());
+app.use(express.json());
+
 // ... (Rest of the file remains same, but now uses the patched axios/fetch)
 const hianime = new HiAnime.Scraper();
 
