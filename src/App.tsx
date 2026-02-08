@@ -397,6 +397,7 @@ export default function App() {
                   width: 100%;
                   overflow-y: auto;
                   -webkit-overflow-scrolling: touch;
+                  touch-action: pan-y;
                 }
                 img {
                   pointer-events: none;
@@ -410,7 +411,7 @@ export default function App() {
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                 .active-press:active { opacity: 0.7; transform: scale(0.98); }
                 .content-row-scroll { 
-                  touch-action: pan-x; 
+                  touch-action: pan-x pan-y; 
                   overscroll-behavior-x: contain; 
                   will-change: transform;
                   -webkit-overflow-scrolling: touch;

@@ -51,7 +51,7 @@ const ContentCard = React.memo(({ movie, onClick, index }: { movie: Movie | TVSh
         duration: 0.4, 
         ease: [0.16, 1, 0.3, 1] 
       }}
-      whileHover={{ scale: 1.05, y: -5 }}
+      whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={handleClick}
       onHoverStart={() => setIsHovered(true)}
@@ -68,6 +68,7 @@ const ContentCard = React.memo(({ movie, onClick, index }: { movie: Movie | TVSh
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none',
         WebkitUserSelect: 'none',
+        touchAction: 'pan-y' // Ensure vertical touch events bubble to the page scroll
       }}
     >
       <div style={{
@@ -276,7 +277,7 @@ const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick 
             marginBottom: '-10px',
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
-            touchAction: 'pan-x',
+            touchAction: 'pan-x pan-y',
             overscrollBehaviorX: 'contain',
           }}
         >
