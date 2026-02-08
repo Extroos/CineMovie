@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Header from './components/layout/Header';
 import Hero from './components/features/home/Hero';
 import ContentRow from './components/features/home/ContentRow';
+import CategoryExplorer from './components/features/home/CategoryExplorer';
 import MovieDetails from './components/features/details/MovieDetails';
 import TVShowDetails from './components/features/details/TVShowDetails';
 import SearchOverlay from './components/features/search/SearchOverlay';
@@ -43,6 +44,7 @@ export default function App() {
   const [showProfileSelector, setShowProfileSelector] = useState(!ProfileService.getActiveProfile());
   
   const [minimalHome, setMinimalHome] = useState(SettingsService.get('minimalHome'));
+  const [selectedCategory, setSelectedCategory] = useState<{ title: string, movies: (Movie | TVShow)[] } | null>(null);
 
   useEffect(() => {
     // Initialize theme
@@ -245,6 +247,7 @@ export default function App() {
           if (selectedMovie) { setSelectedMovie(null); return; }
           if (selectedTVShow) { setSelectedTVShow(null); return; }
           if (selectedActor) { setSelectedActor(null); return; }
+          if (selectedCategory) { setSelectedCategory(null); return; }
           if (searchOpen) { setSearchOpen(false); return; }
           if (searchResultsOpen) { setSearchResultsOpen(false); return; }
 
@@ -464,16 +467,62 @@ export default function App() {
                                 onMovieClick={(item: any) => {
                                   if (item.firstAirDate || item.name) { handleTVShowClick(item); } else { handleMovieClick(item); }
                                 }} 
+                                onSeeAll={() => setSelectedCategory({ 
+                                  title: friendActivityItems.length > 0 ? "What We're Watching" : "Continue Watching", 
+                                  movies: [...friendActivityItems, ...continueWatching].filter((v,i,a)=>a.findIndex(t=>(String(t.id) === String(v.id)))===i) 
+                                })}
                               />
                             )}
                             {!minimalHome && (
                             <>
-                            {trendingTV.length > 0 && ( <ContentRow title="Trending TV Shows" movies={trendingTV} onMovieClick={(show: any) => handleTVShowClick(show)} /> )}
-                            {popular.length > 0 && ( <ContentRow title="Popular Movies" movies={popular} onMovieClick={handleMovieClick} /> )}
-                            {topRated.length > 0 && ( <ContentRow title="Critically Acclaimed" movies={topRated} onMovieClick={handleMovieClick} /> )}
-                            {action.length > 0 && ( <ContentRow title="Trending Action" movies={action} onMovieClick={handleMovieClick} /> )}
-                            {comedy.length > 0 && ( <ContentRow title="Top Comedies" movies={comedy} onMovieClick={handleMovieClick} /> )}
-                            {family.length > 0 && ( <ContentRow title="Trending Family" movies={family} onMovieClick={handleMovieClick} /> )}
+                            {trendingTV.length > 0 && ( 
+                                <ContentRow 
+                                  title="Trending TV Shows" 
+                                  movies={trendingTV} 
+                                  onMovieClick={(show: any) => handleTVShowClick(show)} 
+                                  onSeeAll={() => setSelectedCategory({ title: "Trending TV Shows", movies: trendingTV })}
+                                /> 
+                             )}
+                            {popular.length > 0 && ( 
+                                <ContentRow 
+                                  title="Popular Movies" 
+                                  movies={popular} 
+                                  onMovieClick={handleMovieClick} 
+                                  onSeeAll={() => setSelectedCategory({ title: "Popular Movies", movies: popular })}
+                                /> 
+                             )}
+                            {topRated.length > 0 && ( 
+                                <ContentRow 
+                                  title="Critically Acclaimed" 
+                                  movies={topRated} 
+                                  onMovieClick={handleMovieClick} 
+                                  onSeeAll={() => setSelectedCategory({ title: "Critically Acclaimed", movies: topRated })}
+                                /> 
+                             )}
+                            {action.length > 0 && ( 
+                                <ContentRow 
+                                  title="Trending Action" 
+                                  movies={action} 
+                                  onMovieClick={handleMovieClick} 
+                                  onSeeAll={() => setSelectedCategory({ title: "Trending Action", movies: action })}
+                                /> 
+                             )}
+                            {comedy.length > 0 && ( 
+                                <ContentRow 
+                                  title="Top Comedies" 
+                                  movies={comedy} 
+                                  onMovieClick={handleMovieClick} 
+                                  onSeeAll={() => setSelectedCategory({ title: "Top Comedies", movies: comedy })}
+                                /> 
+                             )}
+                            {family.length > 0 && ( 
+                                <ContentRow 
+                                  title="Trending Family" 
+                                  movies={family} 
+                                  onMovieClick={handleMovieClick} 
+                                  onSeeAll={() => setSelectedCategory({ title: "Trending Family", movies: family })}
+                                /> 
+                             )}
                             {topPicks.length > 0 && ( <ContentRow title="Top Picks for You" movies={topPicks} onMovieClick={(item: any) => { if (item.firstAirDate || item.name) { handleTVShowClick(item); } else { handleMovieClick(item); } }} /> )}
                             {latestReleases.length > 0 && ( <ContentRow title="🎬 Already on VidSrc" movies={latestReleases} onMovieClick={handleMovieClick} /> )}
                             {upcoming.length > 0 && filterKids(upcoming).length > 0 && ( <ContentRow title="Upcoming Releases" movies={filterKids(upcoming)} onMovieClick={handleMovieClick} /> )}
@@ -492,13 +541,13 @@ export default function App() {
                   <div style={{ paddingTop: 0 }}>
                     <Hero movie={heroMovie} onPlayClick={() => setSelectedMovie(heroMovie)} onInfoClick={() => setSelectedMovie(heroMovie)} onSurpriseMe={handleSurpriseMe} />
                     <div style={{ position: 'relative', marginTop: '-4rem', zIndex: 10, background: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 10%)', paddingTop: '2rem' }}>
-                      {trending.length > 0 && ( <ContentRow title="Trending Now" movies={trending} onMovieClick={handleMovieClick} /> )}
-                      {popular.length > 0 && ( <ContentRow title="Popular Movies" movies={popular} onMovieClick={handleMovieClick} /> )}
-                      {topRated.length > 0 && ( <ContentRow title="Top Rated Movies" movies={topRated} onMovieClick={handleMovieClick} /> )}
-                      {action.length > 0 && ( <ContentRow title="Trending Action" movies={action} onMovieClick={handleMovieClick} /> )}
-                      {comedy.length > 0 && ( <ContentRow title="Top Comedies" movies={comedy} onMovieClick={handleMovieClick} /> )}
-                      {family.length > 0 && ( <ContentRow title="Family Hits" movies={family} onMovieClick={handleMovieClick} /> )}
-                      {upcoming.length > 0 && ( <ContentRow title="Upcoming Movies" movies={upcoming} onMovieClick={handleMovieClick} /> )}
+                      {trending.length > 0 && ( <ContentRow title="Trending Now" movies={trending} onMovieClick={handleMovieClick} onSeeAll={() => setSelectedCategory({ title: "Trending Now", movies: trending })} /> )}
+                      {popular.length > 0 && ( <ContentRow title="Popular Movies" movies={popular} onMovieClick={handleMovieClick} onSeeAll={() => setSelectedCategory({ title: "Popular Movies", movies: popular })} /> )}
+                      {topRated.length > 0 && ( <ContentRow title="Top Rated Movies" movies={topRated} onMovieClick={handleMovieClick} onSeeAll={() => setSelectedCategory({ title: "Top Rated Movies", movies: topRated })} /> )}
+                      {action.length > 0 && ( <ContentRow title="Trending Action" movies={action} onMovieClick={handleMovieClick} onSeeAll={() => setSelectedCategory({ title: "Trending Action", movies: action })} /> )}
+                      {comedy.length > 0 && ( <ContentRow title="Top Comedies" movies={comedy} onMovieClick={handleMovieClick} onSeeAll={() => setSelectedCategory({ title: "Top Comedies", movies: comedy })} /> )}
+                      {family.length > 0 && ( <ContentRow title="Family Hits" movies={family} onMovieClick={handleMovieClick} onSeeAll={() => setSelectedCategory({ title: "Family Hits", movies: family })} /> )}
+                      {upcoming.length > 0 && ( <ContentRow title="Upcoming Movies" movies={upcoming} onMovieClick={handleMovieClick} onSeeAll={() => setSelectedCategory({ title: "Upcoming Movies", movies: upcoming })} /> )}
                     </div>
                   </div>
                 </div>
@@ -510,11 +559,11 @@ export default function App() {
                   <div style={{ paddingTop: 0 }}>
                     <Hero movie={heroTVShow as any} onPlayClick={() => setSelectedTVShow(heroTVShow)} onInfoClick={() => setSelectedTVShow(heroTVShow)} />
                     <div style={{ position: 'relative', marginTop: '-4rem', zIndex: 10, background: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 10%)', paddingTop: '2rem' }}>
-                      {(trendingTV.length > 0) && ( <ContentRow title="Trending Series" movies={trendingTV as any} onMovieClick={(show: any) => handleTVShowClick(show)} /> )}
-                      {popularTV.length > 0 && ( <ContentRow title="Most Popular" movies={popularTV} onMovieClick={(show: any) => handleTVShowClick(show)} /> )}
-                      {topRatedTV.length > 0 && ( <ContentRow title="Top Rated" movies={topRatedTV} onMovieClick={(show: any) => handleTVShowClick(show)} /> )}
-                      {dramaTV.length > 0 && ( <ContentRow title="Trending Drama" movies={dramaTV as any} onMovieClick={(show: any) => handleTVShowClick(show)} /> )}
-                      {comedyTV.length > 0 && ( <ContentRow title="Comedy Favorites" movies={comedyTV as any} onMovieClick={(show: any) => handleTVShowClick(show)} /> )}
+                       {(trendingTV.length > 0) && ( <ContentRow title="Trending Series" movies={trendingTV as any} onMovieClick={(show: any) => handleTVShowClick(show)} onSeeAll={() => setSelectedCategory({ title: "Trending Series", movies: trendingTV as any })} /> )}
+                      {popularTV.length > 0 && ( <ContentRow title="Most Popular" movies={popularTV} onMovieClick={(show: any) => handleTVShowClick(show)} onSeeAll={() => setSelectedCategory({ title: "Most Popular", movies: popularTV })} /> )}
+                      {topRatedTV.length > 0 && ( <ContentRow title="Top Rated" movies={topRatedTV} onMovieClick={(show: any) => handleTVShowClick(show)} onSeeAll={() => setSelectedCategory({ title: "Top Rated", movies: topRatedTV })} /> )}
+                      {dramaTV.length > 0 && ( <ContentRow title="Trending Drama" movies={dramaTV as any} onMovieClick={(show: any) => handleTVShowClick(show)} onSeeAll={() => setSelectedCategory({ title: "Trending Drama", movies: dramaTV as any })} /> )}
+                      {comedyTV.length > 0 && ( <ContentRow title="Comedy Favorites" movies={comedyTV as any} onMovieClick={(show: any) => handleTVShowClick(show)} onSeeAll={() => setSelectedCategory({ title: "Comedy Favorites", movies: comedyTV as any })} /> )}
                     </div>
                   </div>
                 </div>
@@ -539,6 +588,23 @@ export default function App() {
               {selectedMovie && ( <MovieDetails movie={selectedMovie} onClose={() => { setSelectedMovie(null); content.refreshContinueWatching(); }} onListUpdate={content.refreshMyList} onActorClick={(id) => setSelectedActor(id)} /> )}
               {selectedTVShow && ( <TVShowDetails show={selectedTVShow} onClose={() => { setSelectedTVShow(null); content.refreshContinueWatching(); }} onActorClick={(id) => setSelectedActor(id)} /> )}
               {selectedActor && ( <ActorPage personId={selectedActor} onClose={() => setSelectedActor(null)} onMovieClick={handleMovieClick} onTVShowClick={handleTVShowClick} /> )}
+              
+              <AnimatePresence>
+                {selectedCategory && (
+                  <CategoryExplorer
+                    title={selectedCategory.title}
+                    movies={selectedCategory.movies}
+                    onClose={() => setSelectedCategory(null)}
+                    onMovieClick={(movie) => {
+                      if ((movie as any).firstAirDate || (movie as any).name) {
+                        handleTVShowClick(movie as any);
+                      } else {
+                        handleMovieClick(movie as any);
+                      }
+                    }}
+                  />
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>

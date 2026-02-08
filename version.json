@@ -1,5 +1,5 @@
 {
-  "version": "0.1.13",
+  "version": "0.1.15",
   "downloadUrl": "https://github.com/Extroos/CineMovie/releases/latest/download/app-release.apk",
-  "releaseNotes": "Absolute Rigidity Update!\n- Eliminated vertical wobble in movie rows\n- Removed negative margin hacks for better gesture stability\n- Guaranteed 1:1 page scroll response on all touches"
+  "releaseNotes": "Category Exploration Update!\n- Added 'See All' button to every movie category\n- Implemented dedicated full-screen grid view for deep browsing\n- Premium glassmorphism transitions for a fluid experience"
 }

@@ -8,6 +8,7 @@ interface ContentRowProps {
   title: string;
   movies: (Movie | TVShow)[];
   onMovieClick?: (movie: Movie | TVShow) => void;
+  onSeeAll?: () => void;
 }
 
 const ContentCard = React.memo(({ movie, onClick, index }: { movie: Movie | TVShow, onClick?: (movie: Movie | TVShow) => void, index: number }) => {
@@ -228,7 +229,7 @@ const ContentCard = React.memo(({ movie, onClick, index }: { movie: Movie | TVSh
   );
 });
 
-const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick }: ContentRowProps) {
+const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick, onSeeAll }: ContentRowProps) {
   if (!movies || movies.length === 0) return null;
 
   return (
@@ -238,23 +239,64 @@ const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick 
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       style={{
-        marginBottom: '1.5rem',
-        paddingTop: '0.5rem',
+        marginBottom: '0.5rem',
         position: 'relative',
         zIndex: 10,
       }
     }>
-      <h2 style={{
-        fontSize: '1.25rem',
-        fontWeight: '900',
-        color: '#FFFFFF',
-        marginBottom: '0.75rem', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         paddingLeft: '5%',
-        letterSpacing: '-0.02em',
-        textTransform: 'none',
+        paddingRight: '5%',
+        marginBottom: '0.75rem',
       }}>
-        {title}
-      </h2>
+        <h2 style={{
+          fontSize: '1.25rem',
+          fontWeight: '900',
+          color: '#FFFFFF',
+          margin: 0,
+          letterSpacing: '-0.02em',
+          textTransform: 'none',
+        }}>
+          {title}
+        </h2>
+
+        {onSeeAll && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              triggerHaptic('light');
+              onSeeAll();
+            }}
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: 'none',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontSize: '11px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'; e.currentTarget.style.color = '#FFFFFF'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'; e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)'; }}
+          >
+            See All
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       <div 
         style={{
@@ -272,8 +314,8 @@ const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick 
             overflowY: 'hidden', 
             paddingLeft: '5%',
             paddingRight: '5%',
-            paddingTop: '20px',    // Stable padding for card scale clearance
-            paddingBottom: '20px', 
+            paddingTop: '12px',    // Tighter clearance for card scale
+            paddingBottom: '12px', 
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
             touchAction: 'pan-x pan-y', 
