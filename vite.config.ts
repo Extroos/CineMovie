@@ -9,25 +9,26 @@ export default defineConfig(({ mode }) => {
         port: 3000,
         host: '0.0.0.0',
         proxy: {
-          '/api': {
-             target: 'http://localhost:3001',
-             changeOrigin: true,
-             rewrite: (path) => path.replace(/^\/api/, ''),
-          },
           '/vidsrc': {
-            target: 'https://vidsrc.icu',
+            target: 'https://v2.vidsrc.me',
             changeOrigin: true,
+            followRedirects: true,
             rewrite: (path) => path.replace(/^\/vidsrc/, ''),
+          },
+          '/vidsrc-cc': {
+            target: 'https://vidsrc.cc',
+            changeOrigin: true,
+            followRedirects: true,
+            rewrite: (path) => path.replace(/^\/vidsrc-cc/, ''),
           },
           '/consumet': {
              target: 'https://api.consumet.org',
              changeOrigin: true,
              rewrite: (path) => path.replace(/^\/consumet/, ''),
           },
-          '/hianime': {
-             target: 'http://localhost:3001',
-             changeOrigin: true,
-             rewrite: (path) => path.replace(/^\/hianime/, ''),
+          '/proxy': {
+            target: 'https://cinemovie-proxy.abderrahmanchakkouri.workers.dev', 
+            changeOrigin: true,
           }
         }
       },
@@ -38,27 +39,8 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          '@/lib': path.resolve(__dirname, 'kitsune-lib'),
-          '@/components': path.resolve(__dirname, 'kitsune-components'),
-          '@/hooks': path.resolve(__dirname, 'kitsune-hooks'),
-          '@/query': path.resolve(__dirname, 'kitsune-query'),
-          '@/mutation': path.resolve(__dirname, 'kitsune-mutation'),
-          '@/providers': path.resolve(__dirname, 'kitsune-providers'),
-          '@/services': path.resolve(__dirname, 'kitsune-services'),
-          '@/contexts': path.resolve(__dirname, 'kitsune-contexts'),
-          '@/assets': path.resolve(__dirname, 'kitsune-assets'),
-          '@/configs': path.resolve(__dirname, 'kitsune-configs'),
-          '@/types': path.resolve(__dirname, 'kitsune-types'),
-          '@/utils': path.resolve(__dirname, 'kitsune-utils'),
-          '@/store': path.resolve(__dirname, 'kitsune-store'),
-          '@/constants': path.resolve(__dirname, 'kitsune-constants'),
-          '@/icons': path.resolve(__dirname, 'kitsune-icons'),
-          '@': path.resolve(__dirname, '.'),
-          'next/link': path.resolve(__dirname, 'kitsune-lib/shims/link.tsx'),
-          'next/image': path.resolve(__dirname, 'kitsune-lib/shims/image.tsx'),
+          '@': path.resolve(__dirname, './src'),
           'next-themes': path.resolve(__dirname, 'node_modules/next-themes'),
-          'next-runtime-env': path.resolve(__dirname, 'kitsune-lib/shims/env.ts'),
-          'next/font/local': path.resolve(__dirname, 'kitsune-lib/shims/font/local.tsx'),
         }
       }
     };

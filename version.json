@@ -1,5 +1,5 @@
 {
-  "version": "0.1.3",
+  "version": "0.1.5",
   "downloadUrl": "https://github.com/Extroos/CineMovie/releases/latest/download/app-release.apk",
-  "releaseNotes": "Performance & Immersion Update!\n- Liquid Glass 60FPS optimization\n- Reduced UI rendering overhead\n- New Clean Native Video Player (no iframe clutter)\n- iOS Home Indicator & Safe Area fixes\n- Centered cinematic player UI"
+  "releaseNotes": "Social & Live Update!\n- Real-time 'What We're Watching' activity sync\n- LIVE pulse indicators for active friends\n- Multi-avatar support for group watching\n- Anti-Clipping fix: No more 'wall' cutting off cards\n- Hover Layering: Interactive cards always stay on top"
 }
