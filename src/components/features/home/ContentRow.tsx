@@ -268,16 +268,16 @@ const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick 
             display: 'flex',
             gap: '12px',
             overflowX: 'auto',
-            overflowY: 'visible',
+            overflowY: 'hidden', // CRITICAL: Stop the row from stealing vertical swipes
             paddingLeft: '5%',
             paddingRight: '5%',
-            paddingTop: '15px',    
-            paddingBottom: '15px', 
-            marginTop: '-15px',
-            marginBottom: '-10px',
+            paddingTop: '30px',    // Increased padding for card scale clearance
+            paddingBottom: '30px', 
+            marginTop: '-30px',
+            marginBottom: '-20px',
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
-            touchAction: 'pan-x pan-y',
+            touchAction: 'pan-x', // STRICT: Only handle horizontal; delegate Y to page
             overscrollBehaviorX: 'contain',
           }}
         >

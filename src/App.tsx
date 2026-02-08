@@ -361,25 +361,21 @@ export default function App() {
                 duration: 0.5, 
                 ease: [0.16, 1, 0.3, 1] // Snappy "out-expo" for better mobile movement
               }}
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: '100%' }}
             >
               <style>{`
                 :root {
                   --brand-red: #E50914;
                 }
                 html, body {
-                  overscroll-behavior: none;
-                  overscroll-behavior-y: contain;
-                  -webkit-overflow-scrolling: touch;
-                  overflow-x: hidden;
-                  touch-action: pan-y;
                   background: #0a0a0a;
                   scroll-behavior: smooth;
-                  height: 100%;
+                  min-height: 100%;
                   width: 100%;
-                  position: fixed; 
-                  left: 0;
-                  top: 0;
+                  overflow-x: hidden;
+                  overflow-y: auto;
+                  overscroll-behavior-y: contain; /* Enable mobile refresh while preventing bounce */
+                  -webkit-overflow-scrolling: touch;
                 }
                 body {
                   font-size: 14px; 
@@ -393,11 +389,10 @@ export default function App() {
                   overflow: hidden; /* App-wide overflow managed by views */
                 }
                 #root {
-                  height: 100%;
                   width: 100%;
-                  overflow-y: auto;
-                  -webkit-overflow-scrolling: touch;
-                  touch-action: pan-y;
+                  min-height: 100vh;
+                  position: relative;
+                  overflow: visible; /* Let the body handle the scroll */
                 }
                 img {
                   pointer-events: none;
