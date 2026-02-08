@@ -255,32 +255,40 @@ const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick 
       </h2>
 
       <div 
-        className="no-scrollbar content-row-scroll"
         style={{
-          display: 'flex',
-          gap: '12px',
-          overflowX: 'auto',
-          overflowY: 'visible', // Allow cards to scale up without being clipped
-          paddingLeft: '5%',
-          paddingRight: '5%',
-          paddingTop: '20px',    // Add padding to prevent clipping at the top
-          paddingBottom: '20px', // Add padding to prevent clipping at the bottom
-          marginTop: '-20px',    // Offset padding to keep layout tight
-          marginBottom: '-8px',
-          WebkitOverflowScrolling: 'touch',
-          scrollBehavior: 'smooth',
-          touchAction: 'auto',
-          overscrollBehaviorX: 'contain',
+          position: 'relative',
+          overflowX: 'hidden', // Contain any horizontal bleed from scaling cards
+          width: '100%',
         }}
       >
-        {movies.map((movie, index) => (
-          <ContentCard 
-            key={`${movie.id}-${(movie as any).name ? 'tv' : 'movie'}`} 
-            movie={movie} 
-            index={index}
-            onClick={onMovieClick} 
-          />
-        ))}
+        <div 
+          className="no-scrollbar content-row-scroll"
+          style={{
+            display: 'flex',
+            gap: '12px',
+            overflowX: 'auto',
+            overflowY: 'visible',
+            paddingLeft: '5%',
+            paddingRight: '5%',
+            paddingTop: '15px',    
+            paddingBottom: '15px', 
+            marginTop: '-15px',
+            marginBottom: '-10px',
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth',
+            touchAction: 'pan-x',
+            overscrollBehaviorX: 'contain',
+          }}
+        >
+          {movies.map((movie, index) => (
+            <ContentCard 
+              key={`${movie.id}-${(movie as any).name ? 'tv' : 'movie'}`} 
+              movie={movie} 
+              index={index}
+              onClick={onMovieClick} 
+            />
+          ))}
+        </div>
       </div>
     </motion.div>
   );

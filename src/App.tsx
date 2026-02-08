@@ -377,7 +377,9 @@ export default function App() {
                   scroll-behavior: smooth;
                   height: 100%;
                   width: 100%;
-                  position: fixed; /* Prevent rubber-banding on some iOS versions */
+                  position: fixed; 
+                  left: 0;
+                  top: 0;
                 }
                 body {
                   font-size: 14px; 
@@ -445,7 +447,14 @@ export default function App() {
                     ) : (
                         <>
                           <Hero movie={heroMovie} onPlayClick={() => setSelectedMovie(heroMovie)} onInfoClick={() => setSelectedMovie(heroMovie)} />
-                          <div style={{ position: 'relative', marginTop: '-4rem', zIndex: 10, background: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 10%)', paddingTop: '2rem' }}>
+                          <div style={{ 
+                            position: 'relative', 
+                            marginTop: '-4rem', 
+                            zIndex: 10, 
+                            background: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 10%)', 
+                            paddingTop: '2rem',
+                            overflowX: 'hidden' // Strictly contain rows from pushing viewport width
+                          }}>
                             {(friendActivityItems.length > 0 || continueWatching.length > 0) && (
                               <ContentRow 
                                 title={friendActivityItems.length > 0 ? "What We're Watching" : "Continue Watching"} 
