@@ -1,5 +1,5 @@
 {
-  "version": "0.1.12",
+  "version": "0.1.13",
   "downloadUrl": "https://github.com/Extroos/CineMovie/releases/latest/download/app-release.apk",
-  "releaseNotes": "Gesture Hijack Fix!\n- Resolved missing CSS classes on movie cards\n- Strictly disabled touch-event transformation on mobile\n- Guaranteed vertical scroll passthrough for all cards"
+  "releaseNotes": "Absolute Rigidity Update!\n- Eliminated vertical wobble in movie rows\n- Removed negative margin hacks for better gesture stability\n- Guaranteed 1:1 page scroll response on all touches"
 }

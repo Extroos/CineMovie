@@ -8,7 +8,7 @@ interface VersionInfo {
   forceUpdate?: boolean;
 }
 
-export const APP_VERSION = '0.1.12';
+export const APP_VERSION = '0.1.13';
 export const UPDATE_MANIFEST_URL = 'https://raw.githubusercontent.com/Extroos/CineMovie/main/version.json';
 
 export async function checkForUpdates(): Promise<VersionInfo | null> {
