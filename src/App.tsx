@@ -372,10 +372,12 @@ export default function App() {
                   scroll-behavior: smooth;
                   min-height: 100%;
                   width: 100%;
+                  margin: 0;
+                  padding: 0;
                   overflow-x: hidden;
                   overflow-y: auto;
-                  overscroll-behavior-y: contain; /* Enable mobile refresh while preventing bounce */
                   -webkit-overflow-scrolling: touch;
+                  touch-action: auto; /* Allow browser to handle all gestures */
                 }
                 body {
                   font-size: 14px; 
@@ -386,13 +388,11 @@ export default function App() {
                   -webkit-user-select: none;
                   -webkit-touch-callout: none;
                   -webkit-tap-highlight-color: transparent;
-                  overflow: hidden; /* App-wide overflow managed by views */
                 }
                 #root {
                   width: 100%;
                   min-height: 100vh;
                   position: relative;
-                  overflow: visible; /* Let the body handle the scroll */
                 }
                 img {
                   pointer-events: none;
@@ -406,10 +406,16 @@ export default function App() {
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                 .active-press:active { opacity: 0.7; transform: scale(0.98); }
                 .content-row-scroll { 
-                  touch-action: pan-x pan-y; 
+                  touch-action: pan-x pan-y; /* Allow both horizontal row exploration and vertical page flow */
                   overscroll-behavior-x: contain; 
                   will-change: transform;
                   -webkit-overflow-scrolling: touch;
+                }
+                @media (hover: none) {
+                  .movie-card {
+                    transform: none !important;
+                    transition: none !important;
+                  }
                 }
                 .profile-item, .profile-avatar, .add-profile-btn, .manage-btn, 
                 .movie-card, .search-overlay, .details-container { 

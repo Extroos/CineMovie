@@ -1,5 +1,5 @@
 {
-  "version": "0.1.5",
+  "version": "0.1.11",
   "downloadUrl": "https://github.com/Extroos/CineMovie/releases/latest/download/app-release.apk",
-  "releaseNotes": "Social & Live Update!\n- Real-time 'What We're Watching' activity sync\n- LIVE pulse indicators for active friends\n- Multi-avatar support for group watching\n- Anti-Clipping fix: No more 'wall' cutting off cards\n- Hover Layering: Interactive cards always stay on top"
+  "releaseNotes": "Definitive Scroll Restoration!\n- Unlocked touch-action restrictions\n- Restored seamless vertical navigation when touching cards\n- Perfected the gesture hand-off between rows and page"
 }

@@ -68,7 +68,7 @@ const ContentCard = React.memo(({ movie, onClick, index }: { movie: Movie | TVSh
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        touchAction: 'pan-y' // Ensure vertical touch events bubble to the page scroll
+        touchAction: 'pan-x pan-y' // Explicitly allow vertical flow
       }}
     >
       <div style={{
@@ -277,7 +277,7 @@ const ContentRow = React.memo(function ContentRow({ title, movies, onMovieClick 
             marginBottom: '-20px',
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
-            touchAction: 'pan-x', // STRICT: Only handle horizontal; delegate Y to page
+            touchAction: 'pan-x pan-y', // Explicitly allow vertical flow to reach the body
             overscrollBehaviorX: 'contain',
           }}
         >
